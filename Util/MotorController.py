@@ -1,5 +1,6 @@
 import rev
-import ctre
+import phoenix6 as ctre
+import rev
 from enum import Enum
  
 class MotorControllerType(Enum):
@@ -49,7 +50,7 @@ class MotorController:
         
         self.reset()
         self.setCurrentLimit()
-        self.setPIDEncoder()
+        #self.setPIDEncoder()
 
     def setPower(self, power):
         """
@@ -62,6 +63,9 @@ class MotorController:
             self.motor.set(power)
         else:
             self.motor.set(ctre.ControlMode.PercentOutput,power)    
+
+    def setInverted(self):
+        self.motor.setInverted(True)
 
     def setPosition(self, position):
         """
@@ -164,9 +168,9 @@ class MotorController:
         Args:
             conversion (float): Conversion factor.
         """
-        self.PositionConversion = conversion
+        self.VelocityConversion = conversion
         if self.motorControllerType is MotorControllerType.SPARK_MAX:
-            self.swerveRelativeEncoder.setVelocityConversionFactor(conversion)
+            self.encoder.setVelocityConversionFactor(conversion)
 
     def reset(self):
         """
@@ -233,7 +237,8 @@ class MotorController:
         """
         if encoder is None:
             if self.motorControllerType is MotorControllerType.SPARK_MAX:
-                self.__getPIDController__().setFeedbackDevice(self.encoder)
+                self.__getPIDController__().setFeedbackDevice(encoder)
+                self.__getPIDController__().setFe
             else:
                 self.motor.configSelectedFeedbackSensor(
                     ctre.FeedbackDevice.CTRE_MagEncoder_Relative,

@@ -3,6 +3,7 @@ from Subsystems.Drive.SwerveDrive import SwerveDrive
 from Subsystems.Drive.SwerveModule import SwerveModule
 from Util.MotorController import MotorController, MotorControllerType, MotorType
 import wpilib
+import ntcore
 from wpimath import kinematics, geometry
 
 #hello abby this is a test
@@ -11,16 +12,15 @@ class Robot(wpilib.TimedRobot):
     counter = 0
 
     def robotInit(self):
-        
-
+        #self.limelight = ntcore.NetworkTableInstance.getDefault().getTable("limelight")
         self.joy = wpilib.XboxController(0)
-
         self.swerveDrive = SwerveDrive()
-        self.swerveModuleFrontRight = SwerveModule(1,2,1)
+        self.counter = 0
         
 
     def robotPeriodic(self):
-        self.swerveModuleFrontRight.debug()
+        self.swerveDrive.enableTelemetry()
+        #print(self.limelight.getNumber("tx", 0.0))
         pass
 
     def autonomousInit(self):
@@ -37,13 +37,8 @@ class Robot(wpilib.TimedRobot):
     def teleopPeriodic(self):
         y = self.joy.getLeftY()*15
 
-        velocity = kinematics.ChassisSpeeds(y, self.joy.getLeftX()*15, self.joy.getRightX()*15);
-        swerveModuleStates = self.kinematics.toSwerveModuleStates(velocity, geometry.Translation2d());
-
-        self.swerveModuleFrontRight.setDesiredState(swerveModuleStates[2]);
-        #setRawModuleStates(swerveModuleStates, isOpenLoop);
-        #self.swerveModuleFrontRight.setPosition(1.5)
-        #self.swerveModuleFrontRight.printAbsEncoder()
+        velocity = kinematics.ChassisSpeeds(-self.joy.getLeftX()*15, y, self.joy.getRightX()*15)
+        self.swerveDrive.drive(velocity, True, geometry.Translation2d(0,0))
 
 
 
