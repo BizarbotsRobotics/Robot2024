@@ -49,13 +49,40 @@ class SwerveConstants:
     SWERVE_MIN_OUTPUT = -1
     SWERVE_MAX_OUTPUT = 1
 
-    # Swerve Motor PID Constants
-    DRIVE_P = .01
-    DRIVE_I = 0
-    DRIVE_D = 0
-    DRIVE_FF = 0
-    DRIVE_MIN_OUTPUT = -1
-    DRIVE_MAX_OUTPUT = 1
+    #Shooter PID Constants
+    SHOOTER_P = .01
+    SHOOTER_I = 0
+    SHOOTER_D = 0
+    SHOOTER_FF = 0
+    SHOOTER_MIN_OUTPUT = -1
+    SHOOTER_MAX_OUTPUT = 1
+
+    
+    #Shooter Pivot PID Constants
+    SHOOTERPIVOT_P = .01
+    SHOOTERPIVOT_I = 0
+    SHOOTERPIVOT_D = 0
+    SHOOTERPIVOT_FF = 0
+    SHOOTERPIVOT_MIN_OUTPUT = -1
+    SHOOTERPIVOT_MAX_OUTPUT = 1
+
+    
+    #Shooter PID Constants
+    SHOOTER_P = .01
+    SHOOTER_I = 0
+    SHOOTER_D = 0
+    SHOOTER_FF = 0
+    SHOOTER_MIN_OUTPUT = -1
+    SHOOTER_MAX_OUTPUT = 1
+
+
+    #Intake Pivot Motor PID Constants
+    INTAKEPIVOT_P = .01
+    INTAKEPIVOT_I = 0
+    INTAKEPIVOT_D = 0
+    INTAKEPIVOT_FF = 0
+    INTAKEPIVOT_MIN_OUTPUT = -1
+    INTAKEPIVOT_MAX_OUTPUT = 1
 
     # Velocity Correction
     VELOCITY_CORRECTION = False
@@ -78,6 +105,16 @@ class IntakeConstants:
 
     # Sets the absolute encoder port
     INTAKE_ENCODER_PORT = 4
+
+class ShooterConstants:
+    SHOOTER_1 = 13
+    SHOOTER_2 = 14
+    SHOOTER_PIVOT_1 = 15
+    SHOOTER_PIVOT_2 = 16
+    INDEXER = 17
+
+class ClimberConstants:
+    CLIMBER = 18
 
 
 

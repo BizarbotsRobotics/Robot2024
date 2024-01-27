@@ -4,27 +4,46 @@ import ntcore
 from wpilib import AnalogEncoder, DriverStation
 from wpimath import kinematics, geometry
 import wpilib
-from constants import SwerveConstants
+from constants import ShooterConstants, ClimberConstants
 from Util.MotorController import MotorController, MotorControllerType, MotorType
 from enum import Enum
 
-class Shoober:
+class ShooterClimber:
 
-    def _init_(self,shooberMotorId, absoluteEncoderPort, encoderOffset, motorControllerType):
+    def __init__(self):
 
         #Initalizes shooter & climber motors
-        self.frontShooter = MotorController(motorControllerType, MotorType.BRUSHLESS, shooberMotorId)
-        self.backShooter = MotorController(motorControllerType, MotorType.BRUSHLESS, shooberMotorId)
-        self.indexerMotor = MotorController(motorControllerType, MotorType.BRUSHLESS, shooberMotorId)
-        self.pivotMotor1 = MotorController(motorControllerType, MotorType.BRUSHLESS, shooberMotorId)
-        self.pivotMotor2 = MotorController(motorControllerType, MotorType.BRUSHLESS, shooberMotorId)
+        self.shooter1 = MotorController(MotorControllerType.CANSparkMax, MotorType.BRUSHLESS, ShooterConstants.SHOOTER_1)
+        self.shooter2 = MotorController(MotorControllerType.CANSparkMax, MotorType.BRUSHLESS,ShooterConstants.SHOOTER_2)
 
-        # Sets the shoober absolute encoder port
-        SHOOBER_ENCODER_PORT = 5
+        self.indexerMotor = MotorController(MotorControllerType.CANSparkMax, MotorType.BRUSHLESS,ShooterConstants.INDEXER)
 
-    # Function to set shoober controller
-    def setShooberMotor(self, shooberMotor, power):
-        self.shooberMotor.setPower(power)
+        self.shooterPivotMotor1 = MotorController(MotorControllerType.CANSparkMax, MotorType.BRUSHLESS, ShooterConstants.SHOOTER_PIVOT_1)
+        self.shooterPivotMotor2 = MotorController(MotorControllerType.CANSparkMax, MotorType.BRUSHLESS, ShooterConstants.SHOOTER_PIVOT_2)
+        
+        self.climberMotor = (MotorControllerType.CANSparkMax, MotorType.BRUSHLESS, ClimberConstants.CLIMBER)
+
+    # Function to set power on shooter motor
+    def setShooterMotor(self, power):
+        self.shooterMotor.setPower(power)
+
+    def setPivotPosition(self, position):
+        pass
+
+    def runClimber(self, power):
+        pass
+    def reverseClimber(self, power):
+        pass
+
+    def runShooter(self, power):
+        pass
+
+    def reverseShooter(self, power):
+        pass
+
+
+    
+
 
 
 

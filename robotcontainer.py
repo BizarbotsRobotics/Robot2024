@@ -8,6 +8,7 @@ import enum
 
 import commands2
 from Subsystems.Intake.Intake import Intake
+from Subsystems.ShooterClimber.ShooterClimber import ShooterClimber
 from Subsystems.Conveyor.Conveyor import Conveyor
 # import commands2
 from Util.MotorController import MotorController, MotorControllerType, MotorType
@@ -38,6 +39,7 @@ class RobotContainer:
     def __init__(self) -> None:
         self.conveyor = Conveyor()
         self.intake = Intake()
+        self.shooterclimber  = ShooterClimber()
         # self.testMotor = MotorController(MotorControllerType.SPARK_MAX, MotorType.BRUSHLESS, 9)
         self.driverController = wpilib.XboxController(0)
         

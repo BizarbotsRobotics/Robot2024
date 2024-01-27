@@ -16,4 +16,4 @@ class Intake(Subsystem):
         self.intakeMotor.setPower(power)
 
     def setPivotPosition(self, positionNum):
-        
+        pass
