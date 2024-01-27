@@ -1,25 +1,21 @@
-import math
-import rev
-import ntcore
-from wpilib import AnalogEncoder, DriverStation
-from wpimath import kinematics, geometry
-import wpilib
-from constants import SwerveConstants
+import commands2
 from Util.MotorController import MotorController, MotorControllerType, MotorType
-from enum import Enum
+from constants import ConveyorConstants
 
-class Conveyor:
+class Conveyor(commands2.Subsystem):
 
-    def _init_(self,conveyorMotorId, absoluteEncoderPort, encoderOffset, motorControllerType):
-        self.conveyorMotor = MotorController(motorControllerType, MotorType.BRUSHLESS, conveyorMotorId)
+    def __init__(self):
+        super().__init__()
+        self.conveyorMotor = MotorController(MotorControllerType.SPARK_MAX, MotorType.BRUSHLESS, ConveyorConstants.CONVEYOR_MOTOR)
         
-    # Sets the absolute encoder port
-    INTAKE_ENCODER_PORT = 4
+        
 
-
-
-    def setConveyorPower(self, conveyorMotor, power):
+    def setConveyorPower(self, power):
         self.conveyorMotor.setPower(power)
+
+
+
+
 
     
 

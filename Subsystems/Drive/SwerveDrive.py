@@ -1,13 +1,14 @@
-from threading import Lock, RLock
+from Subsystems.Drive.SwerveModule import SwerveModule
 from Util.MotorController import MotorControllerType, MotorType
 from wpimath import geometry, kinematics, estimator, controller
-from Subsystems.Drive.SwerveModule import SwerveModule
 from constants import SwerveConstants
 import math
 from phoenix6.hardware import pigeon2
+from commands2 import Subsystem
 
-class SwerveDrive:
+class SwerveDrive(Subsystem):
     def __init__(self):
+        super().__init__()
 
         # Create Swerve Modules from Constants file
         self.initializeModules()
@@ -39,9 +40,8 @@ class SwerveDrive:
            )
         #self.pushOffsetsToControllers()
         
-        
-
-
+    def periodic(self):
+        pass
 
     def initializeModules(self):
         try:

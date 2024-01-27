@@ -66,6 +66,20 @@ class SwerveConstants:
     HEADING_I = 0
     HEADING_D = 0
 
+class ConveyorConstants:
+    # Conveyor Motor ID
+    CONVEYOR_MOTOR = 9
+
+class IntakeConstants:
+    #Intake Motor ID
+    PIVOT_MOTOR_1 = 10
+    PIVOT_MOTOR_2 = 11
+    INTAKE_MOTOR = 12
+
+    # Sets the absolute encoder port
+    INTAKE_ENCODER_PORT = 4
+
+
 
 
 

@@ -22,8 +22,10 @@ class Shoober:
         # Sets the shoober absolute encoder port
         SHOOBER_ENCODER_PORT = 5
 
-        # Function to set shoober controller
-        def setShooberMotor(self, shooberMotor, power):
-            self.shooberMotor.setPower(power)
+    # Function to set shoober controller
+    def setShooberMotor(self, shooberMotor, power):
+        self.shooberMotor.setPower(power)
+
+
 
 

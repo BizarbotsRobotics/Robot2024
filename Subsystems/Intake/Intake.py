@@ -1,22 +1,19 @@
-import math
-import rev
-import ntcore
-from wpilib import AnalogEncoder, DriverStation
-from wpimath import kinematics, geometry
-import wpilib
-from constants import SwerveConstants
+from Subsystems import Subsystem
 from Util.MotorController import MotorController, MotorControllerType, MotorType
-from enum import Enum
+from constants import IntakeConstants
+class Intake(Subsystem):
 
-class Intake:
+    def __init__(self):
+        super().__init__()
 
-    def _init_(self, intakeMotorId, absoluteEncoderPort, encoderOffset, motorControllerType):
-
-        self.pivotMotor1 = MotorController(motorControllerType, MotorType.BRUSHLESS, intakeMotorId)
-        self.pivotMotor2 = MotorController(motorControllerType, MotorType.BRUSHLESS, intakeMotorId)
-        self.intakeWheelMotor = MotorController(motorControllerType, MotorType.BRUSHLESS, intakeMotorId)
+        self.pivotMotor1 = MotorController(MotorControllerType.SPARK_MAX, MotorType.BRUSHLESS, IntakeConstants.PIVOT_MOTOR_1)
+        self.pivotMotor2 = MotorController(MotorControllerType.SPARK_MAX, MotorType.BRUSHLESS, IntakeConstants.PIVOT_MOTOR_2)
+        self.intakeWheelMotor = MotorController(MotorControllerType.SPARK_MAX, MotorType.BRUSHLESS, IntakeConstants.INTAKE_MOTOR)
 
         
 
-        def setIntakePower(self, intakeMotor, power):
-            self.intakeMotor.setPower(power)
+    def setIntakePower(self, power):
+        self.intakeMotor.setPower(power)
+
+    def setPivotPosition(self, positionNum):
+        

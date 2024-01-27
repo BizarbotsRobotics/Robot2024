@@ -1,5 +1,8 @@
 {
     "python.analysis.extraPaths": [
-        "./Util"
+        "./Util",
+        "./Subsystems/Conveyor",
+        "./Subsystems",
+        "./Subsystems"
     ]
 }
