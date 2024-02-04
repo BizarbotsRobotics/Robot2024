@@ -10,7 +10,7 @@ import commands2
 from Subsystems.Intake.Intake import Intake
 from Subsystems.ShooterClimber.ShooterClimber import ShooterClimber
 from Subsystems.Conveyor.Conveyor import Conveyor
-# import commands2
+import commands2
 from Util.MotorController import MotorController, MotorControllerType, MotorType
 import wpimath.controller
 import wpilib
@@ -63,6 +63,16 @@ class RobotContainer:
         #     self.select,
         # )
 
+        self.shooterclimber.setDefaultCommand(
+            # A split-stick arcade command, with forward/backward controlled by the left
+            # hand, and turning controlled by the right.
+            commands2.RunCommand(
+                lambda: self.shooterclimber.runClimber(
+                    self.driverController.getLeftY()),
+                self.shooterclimber
+            )
+        )
+
         # Configure the button bindings
         self.configureButtonBindings()
 
@@ -77,13 +87,48 @@ class RobotContainer:
 
         commands2.button.JoystickButton(self.driverController, wpilib.XboxController.Button.kA).onTrue(
             commands2.InstantCommand(
-                (lambda: self.conveyor.setConveyorPower(.5)), self.conveyor
+                (lambda: self.shooterclimber.runShooter(-1)), self.shooterclimber
             )
         ).onFalse(
             commands2.InstantCommand(
-                (lambda: self.conveyor.setConveyorPower(0)), self.conveyor
+                (lambda: self.shooterclimber.runShooter(0)), self.shooterclimber
+                
             )
         )
+
+        commands2.button.JoystickButton(self.driverController, wpilib.XboxController.Button.kB).onTrue(
+            commands2.InstantCommand(
+                (lambda: self.intake.runIntake(.5)), self.intake
+            )
+        ).onFalse(
+            commands2.InstantCommand(
+                (lambda: self.intake.runIntake(0)), self.intake
+                
+            )
+        )
+
+        commands2.button.JoystickButton(self.driverController, wpilib.XboxController.Button.kX).onTrue(
+            commands2.InstantCommand(
+                (lambda: self.conveyor.runConveyor(.5)), self.conveyor
+            )
+        ).onFalse(
+            commands2.InstantCommand(
+                (lambda: self.conveyor.runConveyor(0)), self.conveyor
+                
+            )
+        )
+
+        commands2.button.JoystickButton(self.driverController, wpilib.XboxController.Button.kY).onTrue(
+            commands2.InstantCommand(
+                (lambda: self.shooterclimber.runIndexer()), self.shooterclimber
+            )
+        ).onFalse(
+            commands2.InstantCommand(
+                (lambda: self.shooterclimber.stopIndexer()), self.shooterclimber
+                
+            )
+        )
+        
         # commands2.button.JoystickButton(self.driverController, wpilib.XboxController.Button.kB).onTrue(
         #     commands2.InstantCommand(
         #         (lambda: self.testMotor.setPower(.5))

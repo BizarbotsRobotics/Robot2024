@@ -10,7 +10,7 @@ class Conveyor(commands2.Subsystem):
         
         
 
-    def setConveyorPower(self, power):
+    def runConveyor(self, power):
         self.conveyorMotor.setPower(power)
 
 

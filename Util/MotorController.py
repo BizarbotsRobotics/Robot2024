@@ -200,7 +200,7 @@ class MotorController:
         else:
             self.motor.setSelectedSensorPosition(position)
 
-    def setCurrentLimit(self, limit=30):
+    def setCurrentLimit(self, limit=40):
         """
         Sets the current limit on the motor, make sure to set this to fix battery and motor burnout issues.
 
@@ -286,5 +286,12 @@ class MotorController:
                 self.motor.setNeutralMode(ctre.NeutralMode.Brake)
             else: 
                 self.motor.setNeutralMode(ctre.NeutralMode.Coast)
+
+    def follow(self,motorController, invert = False):
+        self.motor.follow(motorController.getMotor(), invert)
+
+    def getMotor(self):
+        return self.motor
+    
 
 

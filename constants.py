@@ -11,7 +11,7 @@ class SwerveConstants:
     # PIGEON 2 IMU ID
     PIGEON_PORT = 2
 
-    # Coordinates of swerve modules relative to the center of the robot
+    # Coordinates of swer ve modules relative to the center of the robot
     FRONT_LEFT_CORDS = {'x':.381, 'y':.381}
     FRONT_RIGHT_CORDS = {'x':.381, 'y':-.381}
     BACK_LEFT_CORDS = {'x':-.381, 'y':.381}
@@ -49,41 +49,6 @@ class SwerveConstants:
     SWERVE_MIN_OUTPUT = -1
     SWERVE_MAX_OUTPUT = 1
 
-    #Shooter PID Constants
-    SHOOTER_P = .01
-    SHOOTER_I = 0
-    SHOOTER_D = 0
-    SHOOTER_FF = 0
-    SHOOTER_MIN_OUTPUT = -1
-    SHOOTER_MAX_OUTPUT = 1
-
-    
-    #Shooter Pivot PID Constants
-    SHOOTERPIVOT_P = .01
-    SHOOTERPIVOT_I = 0
-    SHOOTERPIVOT_D = 0
-    SHOOTERPIVOT_FF = 0
-    SHOOTERPIVOT_MIN_OUTPUT = -1
-    SHOOTERPIVOT_MAX_OUTPUT = 1
-
-    
-    #Shooter PID Constants
-    SHOOTER_P = .01
-    SHOOTER_I = 0
-    SHOOTER_D = 0
-    SHOOTER_FF = 0
-    SHOOTER_MIN_OUTPUT = -1
-    SHOOTER_MAX_OUTPUT = 1
-
-
-    #Intake Pivot Motor PID Constants
-    INTAKEPIVOT_P = .01
-    INTAKEPIVOT_I = 0
-    INTAKEPIVOT_D = 0
-    INTAKEPIVOT_FF = 0
-    INTAKEPIVOT_MIN_OUTPUT = -1
-    INTAKEPIVOT_MAX_OUTPUT = 1
-
     # Velocity Correction
     VELOCITY_CORRECTION = False
     HEADING_CORRECTION = False
@@ -107,16 +72,71 @@ class IntakeConstants:
     INTAKE_ENCODER_PORT = 4
 
 class ShooterConstants:
-    SHOOTER_1 = 13
-    SHOOTER_2 = 14
+    SHOOTER_BOTTOM = 13
+    SHOOTER_TOP = 14
     SHOOTER_PIVOT_1 = 15
     SHOOTER_PIVOT_2 = 16
-    INDEXER = 17
+    INDEXER_1 = 17
+    INDEXER_2 = 18
 
-class ClimberConstants:
-    CLIMBER = 18
+    #Shooter PID Constants
+    SHOOTER_P = .01
+    SHOOTER_I = 0
+    SHOOTER_D = 0
+    SHOOTER_FF = 0
+    SHOOTER_MIN_OUTPUT = -1
+    SHOOTER_MAX_OUTPUT = 1
+
+    SHOOTER_FULL_SPEED = 1
+    SHOOTER_AMP_SPEED = 1
+    SHOOTER_LAST_RESORT = 1
+    SHOOTER_HALF_COURT = 1
+    SHOOTER_ZERO = 0
+
+    SHOOTER_SPEEDS = (SHOOTER_ZERO, SHOOTER_AMP_SPEED, SHOOTER_LAST_RESORT, SHOOTER_HALF_COURT, SHOOTER_FULL_SPEED)
 
 
+    #Shooter Pivot PID Constants
+    SHOOTERPIVOT_P = .01
+    SHOOTERPIVOT_I = 0
+    SHOOTERPIVOT_D = 0
+    SHOOTERPIVOT_FF = 0
+    SHOOTERPIVOT_MIN_OUTPUT = -1
+    SHOOTERPIVOT_MAX_OUTPUT = 1
+
+    AMP_ANGLE = 0
+    LAST_RESORT_ANGLE = 0
+    HALF_COURT_ANGLE = 0
+    SHOOTER_ZERO_ANGLE = 0
+
+    SHOOTER_PIVOT_POSITIONS = (SHOOTER_ZERO_ANGLE, AMP_ANGLE, LAST_RESORT_ANGLE, HALF_COURT_ANGLE)
+
+
+    
+    #Indexer PID Constants
+    INDEXER_P = 1
+    INDEXER_I = 0
+    INDEXER_D = 0
+    INDEXER_FF = 0
+    INDEXER_MIN_OUTPUT = -.5
+    INDEXER_MAX_OUTPUT = .5
+
+    INDEXER_FULL_SPEED = 1
+    INDEXER_POSITIONS = []
+
+
+    #Intake Pivot Motor PID Constants
+    INTAKEPIVOT_P = .01
+    INTAKEPIVOT_I = 0
+    INTAKEPIVOT_D = 0
+    INTAKEPIVOT_FF = 0
+    INTAKEPIVOT_MIN_OUTPUT = -1
+    INTAKEPIVOT_MAX_OUTPUT = 1
+
+    INTAKE_START_POS = 0
+    INTAKE_OUT_POS = 1
+
+    
 
 
 
