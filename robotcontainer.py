@@ -7,8 +7,13 @@
 import enum
 
 import commands2
+from Commands.AmpScore import AmpScore
+from Commands.HoldNote import HoldNote
+from Commands.IntakeCmd import IntakeCmd
+from Commands.Shoot import Shoot
+from Subsystems.Drive.SwerveDrive import SwerveDrive
+from Subsystems.Shoober.Shoober import Shoober
 from Subsystems.Intake.Intake import Intake
-from Subsystems.ShooterClimber.ShooterClimber import ShooterClimber
 from Subsystems.Conveyor.Conveyor import Conveyor
 import commands2
 from Util.MotorController import MotorController, MotorControllerType, MotorType
@@ -39,39 +44,32 @@ class RobotContainer:
     def __init__(self) -> None:
         self.conveyor = Conveyor()
         self.intake = Intake()
-        self.shooterclimber  = ShooterClimber()
-        # self.testMotor = MotorController(MotorControllerType.SPARK_MAX, MotorType.BRUSHLESS, 9)
+        self.shoober  = Shoober()
+        self.drive = SwerveDrive()
         self.driverController = wpilib.XboxController(0)
+        self.operatorController = wpilib.XboxController(1)
         
-        # An example selectcommand. Will select from the three commands based on the value returned
-        # by the selector method at runtime. Note that selectcommand takes a generic type, so the
-        # selector does not have to be an enum; it could be any desired type (string, integer,
-        # boolean, double...)
-        # self.example_select_command = commands2.SelectCommand(
-        #     # Maps selector values to commands
-        #     {
-        #         self.CommandSelector.ONE: commands2.PrintCommand(
-        #             "Command one was selected!"
-        #         ),
-        #         self.CommandSelector.TWO: commands2.PrintCommand(
-        #             "Command two was selected!"
-        #         ),
-        #         self.CommandSelector.THREE: commands2.PrintCommand(
-        #             "Command three was selected!"
-        #         ),
-        #     },
-        #     self.select,
-        # )
-
-        self.shooterclimber.setDefaultCommand(
-            # A split-stick arcade command, with forward/backward controlled by the left
-            # hand, and turning controlled by the right.
+        self.drive.setDefaultCommand(
             commands2.RunCommand(
-                lambda: self.shooterclimber.runClimber(
-                    self.driverController.getLeftY()),
-                self.shooterclimber
+                lambda: self.drive.driveFR(self.driverController.getLeftY(), self.driverController.getLeftX(), self.driverController.getRightX(), False, True), self.drive
             )
         )
+        self.shoober.setDefaultCommand(
+            commands2.RunCommand(
+                lambda: self.shoober.setPivotPower(
+                    self.operatorController.getLeftY()),
+                self.shoober
+            )
+        )
+
+        # self.intake.setDefaultCommand(
+        #     commands2.RunCommand(
+        #         lambda: self.intake.setPivotPower(
+        #             self.driverController.getRightY()),
+        #         self.intake
+        #     )
+        # )
+
 
         # Configure the button bindings
         self.configureButtonBindings()
@@ -81,64 +79,22 @@ class RobotContainer:
 
 
     def configureButtonBindings(self) -> None:
-    
-        #while(driverController.getAButtonPressed()):
-        #self.testMotor.set(0.3)
-
-        commands2.button.JoystickButton(self.driverController, wpilib.XboxController.Button.kA).onTrue(
-            commands2.InstantCommand(
-                (lambda: self.shooterclimber.runShooter(-1)), self.shooterclimber
-            )
-        ).onFalse(
-            commands2.InstantCommand(
-                (lambda: self.shooterclimber.runShooter(0)), self.shooterclimber
-                
-            )
+        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kA).onTrue(
+           Shoot(self.shoober) 
         )
 
-        commands2.button.JoystickButton(self.driverController, wpilib.XboxController.Button.kB).onTrue(
-            commands2.InstantCommand(
-                (lambda: self.intake.runIntake(.5)), self.intake
-            )
-        ).onFalse(
-            commands2.InstantCommand(
-                (lambda: self.intake.runIntake(0)), self.intake
-                
-            )
+        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kB).whileTrue(
+            IntakeCmd(self.conveyor, self.intake)
         )
 
-        commands2.button.JoystickButton(self.driverController, wpilib.XboxController.Button.kX).onTrue(
-            commands2.InstantCommand(
-                (lambda: self.conveyor.runConveyor(.5)), self.conveyor
-            )
-        ).onFalse(
-            commands2.InstantCommand(
-                (lambda: self.conveyor.runConveyor(0)), self.conveyor
-                
-            )
-        )
+        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kY).onTrue(
+            HoldNote(self.shoober)
 
-        commands2.button.JoystickButton(self.driverController, wpilib.XboxController.Button.kY).onTrue(
-            commands2.InstantCommand(
-                (lambda: self.shooterclimber.runIndexer()), self.shooterclimber
-            )
-        ).onFalse(
-            commands2.InstantCommand(
-                (lambda: self.shooterclimber.stopIndexer()), self.shooterclimber
-                
-            )
         )
-        
-        # commands2.button.JoystickButton(self.driverController, wpilib.XboxController.Button.kB).onTrue(
-        #     commands2.InstantCommand(
-        #         (lambda: self.testMotor.setPower(.5))
-        #     )
-        # ).onFalse(
-        #     commands2.InstantCommand(
-        #         (lambda: self.testMotor.setPower(0))
-        #     )
-        # )
+        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kX).onTrue(
+            AmpScore(self.shoober)
 
+        )
         
 
         

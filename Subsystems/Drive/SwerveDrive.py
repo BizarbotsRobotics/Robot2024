@@ -1,3 +1,4 @@
+import ntcore
 from Subsystems.Drive.SwerveModule import SwerveModule
 from Util.MotorController import MotorControllerType, MotorType
 from wpimath import geometry, kinematics, estimator, controller
@@ -9,6 +10,10 @@ from commands2 import Subsystem
 class SwerveDrive(Subsystem):
     def __init__(self):
         super().__init__()
+
+        inst = ntcore.NetworkTableInstance.getDefault()
+        inst.startServer()
+        self.sd = inst.getTable("SmartDashboard")
 
         # Create Swerve Modules from Constants file
         self.initializeModules()
@@ -41,22 +46,24 @@ class SwerveDrive(Subsystem):
         #self.pushOffsetsToControllers()
         
     def periodic(self):
+        self.enableTelemetry()
+        self.updateOdometry()
         pass
 
     def initializeModules(self):
         try:
             self.frontLeft = SwerveModule(SwerveConstants.FRONT_LEFT_DRIVE, SwerveConstants.FRONT_LEFT_SWERVE,
                                         SwerveConstants.FRONT_LEFT_ENCODER_PORT, SwerveConstants.FRONT_LEFT_ENCODER_OFFSET, 
-                                        MotorControllerType.SPARK_MAX)
+                                        MotorControllerType.SPARK_MAX, True)
             self.frontRight = SwerveModule(SwerveConstants.FRONT_RIGHT_DRIVE, SwerveConstants.FRONT_RIGHT_SWERVE,
                                         SwerveConstants.FRONT_RIGHT_ENCODER_PORT, SwerveConstants.FRONT_RIGHT_ENCODER_OFFSET, 
-                                        MotorControllerType.SPARK_MAX)
+                                        MotorControllerType.SPARK_MAX, True)
             self.backLeft = SwerveModule(SwerveConstants.BACK_LEFT_DRIVE, SwerveConstants.BACK_LEFT_SWERVE,
                                         SwerveConstants.BACK_LEFT_ENCODER_PORT, SwerveConstants.BACK_LEFT_ENCODER_OFFSET, 
-                                        MotorControllerType.SPARK_MAX)
+                                        MotorControllerType.SPARK_MAX, True)
             self.backRight = SwerveModule(SwerveConstants.BACK_RIGHT_DRIVE, SwerveConstants.BACK_RIGHT_SWERVE,
                                         SwerveConstants.BACK_RIGHT_ENCODER_PORT, SwerveConstants.BACK_RIGHT_ENCODER_OFFSET, 
-                                        MotorControllerType.SPARK_MAX)
+                                        MotorControllerType.SPARK_MAX, True)
             self.backRight.setDriveInverted()
             self.backLeft.setDriveInverted()
             self.swerveModules = [self.frontLeft, self.frontRight, self.backLeft, self.backRight]
@@ -91,23 +98,37 @@ class SwerveDrive(Subsystem):
     def drive(self, velocity, centerOfRotationMeters):
         self.drive(velocity, False, centerOfRotationMeters)
 
-    def drive(self, translation, rotation, fieldRelative, isOpenLoop, centerOfRotationMeters):
-        if fieldRelative:
-            velocity = kinematics.ChassisSpeeds.fromFieldRelativeSpeeds(translation.x, translation.y, rotation, self.yaw())
-        else:
-            velocity = kinematics.ChassisSpeeds(translation.x, translation.y, rotation)
+    # def drive(self, translation, rotation, fieldRelative, isOpenLoop, centerOfRotationMeters):
+    #     if fieldRelative:
+    #         velocity = kinematics.ChassisSpeeds.fromFieldRelativeSpeeds(translation.x, translation.y, rotation, self.yaw())
+    #     else:
+    #         velocity = kinematics.ChassisSpeeds(translation.x, translation.y, rotation)
 
-        self.drive(velocity, isOpenLoop, centerOfRotationMeters)
+    #     self.drive(velocity, isOpenLoop, centerOfRotationMeters)
 
-    def drive(self, translation, rotation, fieldRelative, isOpenLoop):
-        if fieldRelative:
-            velocity = kinematics.ChassisSpeeds.fromFieldRelativeSpeeds(translation.x, translation.y, rotation, self.yaw())
-        else:
-            velocity = kinematics.ChassisSpeeds(translation.x, translation.y, rotation)
+    def driveFR(self, translationX, translationY, rotation, fieldRelative, isOpenLoop):
+        if translationX <= .1 and translationX >= -.1:
+            translationX = 0
+        
+        if translationY <= .1 and translationY >= -.1:
+            translationY = 0
 
-        self.drive(velocity, isOpenLoop, geometry.Translation2d())
+        if rotation <= .1 and rotation >= -.1:
+            rotation = 0
+
+        translationX = translationX * 15
+        translationY = translationY * 15
+        rotation = rotation * 15
+
+        self.sd.putNumber("translationX", translationX)
+        self.sd.putNumber("translationY", translationY)
+        self.sd.putNumber("Rotation", rotation)
+        
+        velocity = kinematics.ChassisSpeeds(translationX, translationY, rotation)
+
+        self.driveF(velocity, True, geometry.Translation2d(0,0))
     
-    def drive(self, velocity, isOpenLoop, centerOfRotationMeters):
+    def driveF(self, velocity, isOpenLoop, centerOfRotationMeters):
         
         # if SwerveConstants.VELOCITY_CORRECTION:
         #     dtConstant = 0.009
@@ -253,16 +274,15 @@ class SwerveDrive(Subsystem):
             # If the velocity of the robot is less than 1% we reseed the encoders
             self.moduleSynchronizationCounter+=1
             if sumVelocity <= .01 and self.moduleSynchronizationCounter > 5:
-                #self.synchronizeModuleEncoders()
+                self.synchronizeModuleEncoders()
                 self.moduleSynchronizationCounter = 0
         except Exception as e:
             raise e
         return None
 
     def synchronizeModuleEncoders(self):
-        pass
-        #for swerve in self.swerveModules:
-            #swerve.queueSynchronizeEncoders()
+        for swerve in self.swerveModules:
+            swerve.queueSynchronizeEncoders()
         #TODO add this method in swerve module class
 
 

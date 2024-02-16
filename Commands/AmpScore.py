@@ -12,7 +12,7 @@ from Subsystems.Shoober.Shoober import Shoober
 import constants
 
 
-class Shoot(commands2.Command):
+class AmpScore(commands2.Command):
     """A command that will turn the robot to the specified angle."""
 
     def __init__(self, shoober: Shoober) -> None:
@@ -25,24 +25,33 @@ class Shoot(commands2.Command):
         self.shoober = shoober
         super().__init__()
         self.addRequirements(self.shoober)
+        self.timer = 0
+        self.timerTwo = 0
 
     def initialize(self):
-        self.shoober.setShooterMotorRPM(-3000)
-        self.shoober.setPivotPosition(10)
+        # self.shoober.setShooterMotorRPM(-3000)
+        self.shoober.setPivotPosition(120)
+        self.shoober.setDualIndexerPosition(-.4)
 
     def execute(self):
         """The main body of a command. Called repeatedly while the command is scheduled."""
-        if  self.shoober.getShooterRPM() < -2800 and self.shoober.getShooterRPM() > -3010 and self.shoober.getPivotAngle() > 9:
-            self.shoober.setDualIndexerPower(-1)
+        if  self.shoober.getPivotAngle() > 119:
+            self.shoober.setBottomIndexerPower(-.7)
+            self.shoober.setTopIndexerPower(.7)
+            self.timer += 1
+        if self.timerTwo > 30 and self.shoober.getPivotAngle() < 119:
+            self.shoober.setDualIndexerPower(0)
+        self.timerTwo+=1
 
         
 
 
     def end(self, interrupted: bool):
-        self.shoober.setShooterMotorPower(0)
         self.shoober.setDualIndexerPower(0)
         self.shoober.setPivotPower(0)
 
     def isFinished(self) -> bool:
         # End when the controller is at the reference.
-        return not self.shoober.getNoteStored()
+        if self.timer > 60:
+            return not self.shoober.getNoteStored()
+        return False

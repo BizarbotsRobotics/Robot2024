@@ -64,8 +64,8 @@ class MotorController:
         else:
             self.motor.set(ctre.ControlMode.PercentOutput,power)    
 
-    def setInverted(self):
-        self.motor.setInverted(True)
+    def setInverted(self, invert):
+        self.motor.setInverted(invert)
 
     def setPosition(self, position):
         """
@@ -196,11 +196,11 @@ class MotorController:
             position (float): position to be set.
         """
         if self.motorControllerType is MotorControllerType.SPARK_MAX:
-            self.encoder.setPosition(position)
+            print(self.encoder.setPosition(position))
         else:
             self.motor.setSelectedSensorPosition(position)
 
-    def setCurrentLimit(self, limit=40):
+    def setCurrentLimit(self, limit=50):
         """
         Sets the current limit on the motor, make sure to set this to fix battery and motor burnout issues.
 
@@ -246,14 +246,14 @@ class MotorController:
                     self.kTimeoutMs,
                 )
                 self.motor.setSensorPhase(True)
-                self.motor.setInverted(False)
+                self.motor.setInverted(True)
         else:
             if self.motorControllerType is MotorControllerType.SPARK_MAX:
                 self.__getPIDController__().setFeedbackDevice(encoder)
             else:
                 self.motor.configSelectedFeedbackSensor(encoder, 0, 10)
                 self.motor.setSensorPhase(True)
-                self.motor.setInverted(False)
+                self.motor.setInverted(True)
     
     def setVoltageCompensation(self, voltage):
         """
@@ -292,6 +292,22 @@ class MotorController:
 
     def getMotor(self):
         return self.motor
+    
+    def setRampRate(self, time):
+        self.motor.setOpenLoopRampRate(time)
+
+    def initAbsoluteEncoder(self):
+        self.absoluteEncoder = self.motor.getAbsoluteEncoder(rev.SparkMaxAbsoluteEncoder.Type.kDutyCycle)
+
+    def useAbsoluteEncoder(self):
+        self.__getPIDController__().setFeedbackDevice(self.absoluteEncoder)
+
+    def getAbsoluteEncoderPosition(self):
+        return self.absoluteEncoder.getPosition()
+    
+    def getAbsoluteEncoder(self):
+        return self.absoluteEncoder
+
     
 
 

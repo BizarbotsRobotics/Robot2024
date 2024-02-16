@@ -12,8 +12,7 @@ class SwerveModule:
     """
     Swerve Module Class that represents a physical SDS swerve module. Use in conjuction with SwerveDrive.
     """
-    def __init__(self, driveMotorId,swerveMotorId, absoluteEncoderPort, encoderOffset, motorControllerType):
-        print(encoderOffset)
+    def __init__(self, driveMotorId,swerveMotorId, absoluteEncoderPort, encoderOffset, motorControllerType, isInverted):
         # Start smart dashboard
         inst = ntcore.NetworkTableInstance.getDefault()
         inst.startServer()
@@ -28,9 +27,15 @@ class SwerveModule:
         self.swerveMotor = MotorController(motorControllerType, MotorType.BRUSHLESS, swerveMotorId)
         self.driveMotor =  MotorController(motorControllerType, MotorType.BRUSHLESS, driveMotorId)
 
+        self.swerveMotor.setCurrentLimit(50)
+        self.driveMotor.setCurrentLimit(50)
+
+        #self.swerveMotor.setRampRate(10)
+
         # Get Absolute encoder
         self.swerveAbsoluteEncoder = AnalogEncoder(absoluteEncoderPort)
-        self.swerveMotor.setInverted()
+
+        self.swerveMotor.setInverted(isInverted)
 
         #self.swerveMotor.setPIDEncoder(self.swerveAbsoluteEncoder)
         
@@ -58,17 +63,17 @@ class SwerveModule:
                                       kMaxOut=SwerveConstants.SWERVE_MAX_OUTPUT)
 
         # Set PID Values
-        self.driveMotor.setPIDValues(kf=SwerveConstants.DRIVE_FF, 
-                                      kp=SwerveConstants.DRIVE_P, ki=SwerveConstants.DRIVE_I, 
-                                      kd=SwerveConstants.DRIVE_D, kMinOut=SwerveConstants.DRIVE_MIN_OUTPUT, 
-                                      kMaxOut=SwerveConstants.DRIVE_MAX_OUTPUT)
+        # self.driveMotor.setPIDValues(kf=SwerveConstants.DRIVE_FF, 
+        #                               kp=SwerveConstants.DRIVE_P, ki=SwerveConstants.DRIVE_I, 
+        #                               kd=SwerveConstants.DRIVE_D, kMinOut=SwerveConstants.DRIVE_MIN_OUTPUT, 
+        #                               kMaxOut=SwerveConstants.DRIVE_MAX_OUTPUT)
 
         # Saves settings to motor controllers
         self.driveMotor.save()
         self.swerveMotor.save()
 
         reference = (self.getAbsolutePosition() - self.encoderOffset) * 360
-        self.swerveMotor.seedBuiltInEncoder(self.getSwerveAbsolutePosition())
+        print(self.swerveMotor.seedBuiltInEncoder(self.getSwerveAbsolutePosition()))
 
         
         self.synchronizeEncoderQueued = True
@@ -118,14 +123,14 @@ class SwerveModule:
                                                 geometry.Rotation2d.fromDegrees(self.getSwerveRelativePosition()))
         
         
-        #desiredState = self.antiJitter(desiredState, self.lastState, 10)
+        desiredState = self.antiJitter(desiredState, self.lastState, 10)
 
         # Azimuth Motor Set angle
         
         if (desiredState.angle is not self.lastState.angle) or self.synchronizeEncoderQueued:
             if self.swerveAbsoluteEncoder is not None and self.synchronizeEncoderQueued:
                 absoluteEncoderPosition = (self.getAbsolutePosition()) * 360
-                #self.swerveMotor.seedBuiltInEncoder(absoluteEncoderPosition)
+                self.swerveMotor.seedBuiltInEncoder(self.getSwerveAbsolutePosition())
                 self.setSwervePositionDegrees(desiredState.angle.degrees())
                 self.synchronizeEncoderQueued = False   
                 print("cheese")
@@ -165,7 +170,7 @@ class SwerveModule:
         Sends debug info to condole or smart dashboard
         """
         self.sd.putNumber("Encoder "+ str(self.swerveMotorId), self.swerveMotor.getBuiltInEncoderPosition())
-        self.sd.putNumber("Absolute Encoder "+ str(self.swerveMotorId), self.getSwerveAbsolutePosition())
+        self.sd.putNumber("Absolute Encoder "+ str(self.swerveMotorId), self.getSwerveAbsolutePositionReal())
         pass
 
     def getSwerveRelativePosition(self):
@@ -177,6 +182,9 @@ class SwerveModule:
         """
         return self.swerveMotor.getBuiltInEncoderPosition()
     
+    def getSwerveAbsolutePositionReal(self):
+        return self.swerveAbsoluteEncoder.getAbsolutePosition()
+
     def getSwerveAbsolutePosition(self):
         """
         Returns the absolute encoders position.
@@ -249,7 +257,7 @@ class SwerveModule:
             print("There is no Absolute Encoder on module #" + str(0), False)
 
     def setDriveInverted(self):
-        self.driveMotor.setInverted()
+        self.driveMotor.setInverted(True)
 
         
 
