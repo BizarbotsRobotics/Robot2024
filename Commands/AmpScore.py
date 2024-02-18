@@ -25,33 +25,35 @@ class AmpScore(commands2.Command):
         self.shoober = shoober
         super().__init__()
         self.addRequirements(self.shoober)
-        self.timer = 0
-        self.timerTwo = 0
+        
 
     def initialize(self):
         # self.shoober.setShooterMotorRPM(-3000)
-        self.shoober.setPivotPosition(120)
-        self.shoober.setDualIndexerPosition(-.4)
+        # self.shoober.setPivotPosition(120)
+        self.shoober.resetPosition()
+        self.shoober.setDualIndexerPosition(-20)
+        self.run = True
+        self.timer = 0
+        self.timerTwo = 0
+
+        self.shoober.setPivotPosition(130)
 
     def execute(self):
         """The main body of a command. Called repeatedly while the command is scheduled."""
-        if  self.shoober.getPivotAngle() > 119:
+        if  self.shoober.getPivotAngle() > 129 and self.shoober.getIndexerPosition() < -19:
             self.shoober.setBottomIndexerPower(-.7)
             self.shoober.setTopIndexerPower(.7)
+            
             self.timer += 1
-        if self.timerTwo > 30 and self.shoober.getPivotAngle() < 119:
-            self.shoober.setDualIndexerPower(0)
-        self.timerTwo+=1
-
         
 
 
     def end(self, interrupted: bool):
         self.shoober.setDualIndexerPower(0)
-        self.shoober.setPivotPower(0)
+        # self.shoober.setPivotPower(0)
 
     def isFinished(self) -> bool:
         # End when the controller is at the reference.
-        if self.timer > 60:
+        if self.timer > 20:
             return not self.shoober.getNoteStored()
         return False

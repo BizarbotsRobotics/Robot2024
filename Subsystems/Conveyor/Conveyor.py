@@ -1,5 +1,7 @@
 import commands2
 import ntcore
+import rev
+import wpilib
 from Util.MotorController import MotorController, MotorControllerType, MotorType
 from constants import ConveyorConstants
 
@@ -12,6 +14,7 @@ class Conveyor(commands2.Subsystem):
         self.inst.startServer()
         self.sd = self.inst.getTable("SmartDashboard")
         
+        self.colorSensor = rev.ColorSensorV3(wpilib.I2C.Port.kMXP)
         self.conveyorMotor = MotorController(MotorControllerType.SPARK_MAX, MotorType.BRUSHLESS, ConveyorConstants.CONVEYOR_MOTOR)
         self.conveyorMotor.setEncoderPositionConversion(.33)
         self.conveyorMotor.setCurrentLimit(30)
@@ -26,6 +29,9 @@ class Conveyor(commands2.Subsystem):
         """
         self.sd.putNumber("Conveyor RPM", self.getConveyorRPM())
         self.sd.putBoolean("Note Stored", self.getNoteStored())
+        self.sd.putNumber("Note Prox", self.colorSensor.getProximity())
+        if self.colorSensor.getProximity() is 2047:
+            self.colorSensor = rev.ColorSensorV3(wpilib.I2C.Port.kMXP)
 
     def getConveyorRPM(self):
         return self.conveyorMotor.getBuiltInEncoderPosition()
@@ -34,7 +40,7 @@ class Conveyor(commands2.Subsystem):
         self.conveyorMotor.setPower(power)
 
     def getNoteStored(self):
-        if self.inst.getEntry("/proximity1").getDouble(0)>200:
+        if self.colorSensor.getProximity() > 400:
             return True
         return False
 

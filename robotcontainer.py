@@ -28,6 +28,7 @@ class RobotContainer:
     periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
     subsystems, commands, and button mappings) should be declared here.
     """
+    
     # The enum used as keys for selecting the command to run.
     class CommandSelector(enum.Enum):
         ONE = enum.auto()
@@ -48,7 +49,9 @@ class RobotContainer:
         self.drive = SwerveDrive()
         self.driverController = wpilib.XboxController(0)
         self.operatorController = wpilib.XboxController(1)
-        
+
+        self.compressor = wpilib.Compressor(19,wpilib.PneumaticsModuleType.REVPH)
+        self.compressor.disable()
         self.drive.setDefaultCommand(
             commands2.RunCommand(
                 lambda: self.drive.driveFR(self.driverController.getLeftY(), self.driverController.getLeftX(), self.driverController.getRightX(), False, True), self.drive
@@ -65,7 +68,7 @@ class RobotContainer:
         # self.intake.setDefaultCommand(
         #     commands2.RunCommand(
         #         lambda: self.intake.setPivotPower(
-        #             self.driverController.getRightY()),
+        #             self.operatorController.getRightY()),
         #         self.intake
         #     )
         # )
@@ -79,23 +82,35 @@ class RobotContainer:
 
 
     def configureButtonBindings(self) -> None:
-        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kA).onTrue(
+        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kA).whileTrue(
            Shoot(self.shoober) 
         )
 
-        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kB).whileTrue(
+        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kB).onTrue(
             IntakeCmd(self.conveyor, self.intake)
         )
 
         commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kY).onTrue(
-            HoldNote(self.shoober)
+            HoldNote(self.shoober, self.conveyor)
 
         )
         commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kX).onTrue(
             AmpScore(self.shoober)
 
         )
-        
+        # commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kLeftBumper).onTrue(
+            
+        #     commands2.RunCommand(
+        #         lambda: self.shoober.engageLock(),
+        #         self.shoober
+        #     )
+        # )
+        # commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kRightBumper).onTrue(
+        #     commands2.RunCommand(
+        #         lambda: self.shoober.disengageLock(),
+        #         self.shoober
+        #     )
+        # )
 
         
 

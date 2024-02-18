@@ -1,6 +1,7 @@
 import rev
-import phoenix6 as ctre
 import rev
+from phoenix6.hardware import TalonFX
+import phoenix6
 from enum import Enum
  
 class MotorControllerType(Enum):
@@ -40,7 +41,11 @@ class MotorController:
             self.encoder = self.motor.getEncoder()
             self.pidController = self.motor.getPIDController()
         elif motorControllerType == MotorControllerType.FALCON:
-            self.motor = ctre.TalonFX(motorID)
+            self.motor = TalonFX(motorID)
+            self.cfg = phoenix6.configs.TalonFXConfiguration()
+            self.cfg.motor_output.neutral_mode = phoenix6.signals.NeutralModeValue.BRAKE
+            self.motor.configurator.apply(self.cfg)
+            self.controls = phoenix6.controls.DutyCycleOut(0)
         elif motorControllerType == MotorControllerType.VICTOR_SPX:
             self.motor = ctre.VictorSPX(motorID)
         elif motorControllerType == MotorControllerType.TALON_SRX:
@@ -62,7 +67,7 @@ class MotorController:
         if self.motorControllerType is MotorControllerType.SPARK_MAX:
             self.motor.set(power)
         else:
-            self.motor.set(ctre.ControlMode.PercentOutput,power)    
+            self.motor.set_control(self.controls.with_output(power))
 
     def setInverted(self, invert):
         self.motor.setInverted(invert)
@@ -179,7 +184,8 @@ class MotorController:
         if self.motorControllerType is MotorControllerType.SPARK_MAX:
             self.motor.restoreFactoryDefaults()
         else:
-            self.motor.configFactoryDefault()
+            pass
+            # self.motor.configFactoryDefault()
 
     def save(self):
         """
@@ -210,9 +216,10 @@ class MotorController:
         if self.motorControllerType is MotorControllerType.SPARK_MAX:
             self.motor.setSmartCurrentLimit(limit)
         else:
-            self.motor.configPeakCurrentDuration(1.5)
-            self.motor.configPeakCurrentLimit(limit)
-            self.motor.configStatorCurrentLimit(limit)
+            pass
+            # self.motor.configPeakCurrentDuration(1.5)
+            # self.motor.configPeakCurrentLimit(limit)
+            # self.motor.configStatorCurrentLimit(limit)
 
     def setPositionPIDWrapping(self, enable=False, min=-180, max=180):
         """
@@ -283,12 +290,18 @@ class MotorController:
                 self.motor.setIdleMode(rev.CANSparkMax.IdleMode.kCoast)
         else:
             if brake:
-                self.motor.setNeutralMode(ctre.NeutralMode.Brake)
+                pass
             else: 
-                self.motor.setNeutralMode(ctre.NeutralMode.Coast)
+                pass
+                # self.motor.setNeutralMode(ctre.NeutralMode.Coast)
 
     def follow(self,motorController, invert = False):
-        self.motor.follow(motorController.getMotor(), invert)
+    
+        if self.motorControllerType is MotorControllerType.SPARK_MAX:
+            self.motor.follow(motorController.getMotor(), invert)
+        else:
+            pass
+            # self.motor.follow(motorController.getMotor())
 
     def getMotor(self):
         return self.motor
@@ -307,6 +320,9 @@ class MotorController:
     
     def getAbsoluteEncoder(self):
         return self.absoluteEncoder
+    
+    def resetPosition(self):
+        print("RESET:",self.encoder.setPosition(0))
 
     
 

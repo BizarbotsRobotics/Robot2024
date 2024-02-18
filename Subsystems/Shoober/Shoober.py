@@ -2,7 +2,7 @@ import math
 from commands2 import Subsystem
 import rev
 import ntcore
-from wpilib import AnalogEncoder, DriverStation
+from wpilib import AnalogEncoder, DriverStation, PneumaticsModuleType
 from wpimath import kinematics, geometry
 import wpilib
 from constants import ShooterConstants
@@ -16,6 +16,10 @@ class Shoober(Subsystem):
         self.inst = ntcore.NetworkTableInstance.getDefault()
         self.inst.startServer()
         self.sd = self.inst.getTable("SmartDashboard")
+
+        self.distance = wpilib.DigitalInput(9)
+
+        # self.pistonLock = wpilib.DoubleSolenoid(19, PneumaticsModuleType.REVPH, 0, 1)
 
         #Initalizes shooter & climber motors
         self.shooterMotorBottom = MotorController(MotorControllerType.SPARK_MAX, MotorType.BRUSHLESS, ShooterConstants.SHOOTER_BOTTOM_ID)
@@ -96,6 +100,9 @@ class Shoober(Subsystem):
         self.sd.putNumber("Shoober Angle", self.shooterPivotMotorOne.getAbsoluteEncoderPosition() - 17.88)
         self.sd.putBoolean("Shooter Note Stored", self.getNoteStored())
 
+        self.sd.putNumber("robot distance", self.distance.get())
+        self.sd.putNumber("indexer position", self.getIndexerPosition())
+
         pass
 
     # Function to set power on shooter motor
@@ -109,7 +116,7 @@ class Shoober(Subsystem):
         return self.shooterMotorBottom.getBuiltInEncoderVelocity()
     
     def getPivotAngle(self):
-        return self.shooterPivotMotorOne.getBuiltInEncoderPosition()
+        return self.shooterPivotMotorOne.getAbsoluteEncoderPosition() - 17.88
     
     def setPivotPower(self, power):
         self.shooterPivotMotorOne.setPower(power)
@@ -144,6 +151,21 @@ class Shoober(Subsystem):
     
     def getNoteStored(self):
         return self.noteHeld
+    
+    def engageLock(self):
+        self.pistonLock.set(wpilib.DoubleSolenoid.Value.kForward)
+
+    def disengageLock(self):
+        self.pistonLock.set(wpilib.DoubleSolenoid.Value.kReverse)
+
+    def resetPosition(self):
+        self.indexerMotorOne.resetPosition()
+        self.indexerMotorTwo.resetPosition()
+
+    def getIndexerPosition(self):
+        return self.indexerMotorOne.getBuiltInEncoderPosition()
+
+    
 
     
 

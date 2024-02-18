@@ -30,7 +30,7 @@ class IntakeCmd(commands2.Command):
         self.addRequirements(self.conveyor, self.intake)
 
     def initialize(self):
-        self.conveyor.setConveyorPower(.7)
+        self.conveyor.setConveyorPower(.5)
         self.intake.setIntakePower(1)
 
     def execute(self):        
@@ -42,4 +42,4 @@ class IntakeCmd(commands2.Command):
         
 
     def isFinished(self) -> bool:
-        return False
+        return self.conveyor.getNoteStored()

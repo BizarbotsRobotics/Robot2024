@@ -64,8 +64,8 @@ class ConveyorConstants:
 
 class IntakeConstants:
     #Intake Motor ID
-    PIVOT_MOTOR_1 = 10
-    PIVOT_MOTOR_2 = 11
+    PIVOT_MOTOR_1 = 1
+    PIVOT_MOTOR_2 = 2
     INTAKE_MOTOR = 12
 
     # Sets the absolute encoder port
@@ -94,12 +94,12 @@ class ShooterConstants:
     SHOOTER_ZERO = 0
 
     #Shooter Pivot PID Constants
-    SHOOTERPIVOT_P = .01
+    SHOOTERPIVOT_P = .012
     SHOOTERPIVOT_I = 0
     SHOOTERPIVOT_D = 0
     SHOOTERPIVOT_FF = 0
-    SHOOTERPIVOT_MIN_OUTPUT = -.6
-    SHOOTERPIVOT_MAX_OUTPUT = .6
+    SHOOTERPIVOT_MIN_OUTPUT = -1
+    SHOOTERPIVOT_MAX_OUTPUT = 1
     
     #Indexer PID Constants
     INDEXER_P = 1

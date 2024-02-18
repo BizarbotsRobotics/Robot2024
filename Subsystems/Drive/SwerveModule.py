@@ -73,7 +73,6 @@ class SwerveModule:
         self.swerveMotor.save()
 
         reference = (self.getAbsolutePosition() - self.encoderOffset) * 360
-        print(self.swerveMotor.seedBuiltInEncoder(self.getSwerveAbsolutePosition()))
 
         
         self.synchronizeEncoderQueued = True
@@ -133,7 +132,6 @@ class SwerveModule:
                 self.swerveMotor.seedBuiltInEncoder(self.getSwerveAbsolutePosition())
                 self.setSwervePositionDegrees(desiredState.angle.degrees())
                 self.synchronizeEncoderQueued = False   
-                print("cheese")
             else:
                 self.setSwervePositionDegrees(desiredState.angle.degrees())
 
@@ -245,11 +243,9 @@ class SwerveModule:
         return kinematics.SwerveModulePosition(position, azimuth)
 
     def pushOffsetsToControllers(self):
-        print("rofl")
         if self.swerveAbsoluteEncoder is not None:
-            print("kevin is dumb")
            # self.swerveAbsoluteEncoder.setPositionOffset(self.encoderOffset)
-            print("lol")
+            pass
             #self.encoderOffset = 0
             # else:
             #     print("Pushing the Absolute Encoder offset to the encoder failed on module #" + str(0), False)

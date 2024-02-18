@@ -65,7 +65,7 @@ class SwerveDrive(Subsystem):
                                         SwerveConstants.BACK_RIGHT_ENCODER_PORT, SwerveConstants.BACK_RIGHT_ENCODER_OFFSET, 
                                         MotorControllerType.SPARK_MAX, True)
             self.backRight.setDriveInverted()
-            self.backLeft.setDriveInverted()
+            # self.backLeft.setDriveInverted()
             self.swerveModules = [self.frontLeft, self.frontRight, self.backLeft, self.backRight]
         except Exception as e:
             raise Exception("Check ports in constants file or check for Incorrect can IDs")
@@ -325,7 +325,6 @@ class SwerveDrive(Subsystem):
         return tuple(positions)
     
     def pushOffsetsToControllers(self):
-        print("emily")
         for swerve in self.swerveModules:
             swerve.pushOffsetsToControllers()
 
