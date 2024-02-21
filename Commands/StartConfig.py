@@ -8,14 +8,15 @@ import wpilib
 import commands2
 import commands2.cmd
 import wpimath.controller
+from Subsystems.Intake.Intake import Intake
 from Subsystems.Shoober.Shoober import Shoober
 import constants
 
 
-class AmpScore(commands2.Command):
+class StartConfig(commands2.Command):
     """A command that will turn the robot to the specified angle."""
 
-    def __init__(self, shoober: Shoober) -> None:
+    def __init__(self, shoober: Shoober, intake: Intake) -> None:
         """
         Turns to robot to the specified angle.
 
@@ -25,35 +26,25 @@ class AmpScore(commands2.Command):
         self.shoober = shoober
         super().__init__()
         self.addRequirements(self.shoober)
-        
+        self.intake = intake
 
     def initialize(self):
-        # self.shoober.setShooterMotorRPM(-3000)
-        # self.shoober.setPivotPosition(120)
         self.run = True
-        self.timer = 0
-        self.timerTwo = 0
-
+        self.intake.resetPivotEncoder()
         self.shoober.setPivotPosition(130)
-
-    def execute(self):
-        """The main body of a command. Called repeatedly while the command is scheduled."""
-        if  self.shoober.getPivotAngle() > 129:
-            self.shoober.setBottomIndexerPower(-1)
-            self.shoober.setTopIndexerPower(1)
-            self.shoober.setShooterMotorPower(1)
-            self.timer += 1
-        
-
-
+            
     def end(self, interrupted: bool):
-        self.shoober.setDualIndexerPower(0)
-        # self.shoober.setPivotPower(0)
-        self.shoober.setShooterMotorPower(0)
-        self.shoober.setPivotPosition(0)
+        self.intake.setPivotPower(0)
+        self.shoober.setPivotPower(0)
 
     def isFinished(self) -> bool:
         # End when the controller is at the reference.
-        if self.timer > 30:
-            return not self.shoober.getNoteStored()
-        return False
+        return self.shoober.getPivotAngle() < 5
+        #self.shoober.setPivotPosition(130)
+
+    def execute(self):
+        if  self.shoober.getPivotAngle() > 129 and self.run:
+            self.intake.setPivotPosition(2)
+            self.run = False
+        if self.run == False:
+            self.shoober.setPivotPosition(0)

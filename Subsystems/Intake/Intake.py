@@ -18,19 +18,18 @@ class Intake(commands2.Subsystem):
 
         self.pivotMotorTwo.follow(self.pivotMotorOne, False)
 
-        # self.pivotMotorOne.setPIDValues(IntakeConstants. 
-        #                                   IntakeConstants.INAKEPIVOT_P, 
-        #                                   IntakeConstants.INTAKEPIVOT_I, 
-        #                                   IntakeConstants.INTAKEPIVOT_D, 
-        #                                   IntakeConstants.INTAKEPIVOT_MAX_OUTPUT, 
-        #                                   IntakeConstants.INTAKEPIVOT_MIN_OUTPUT)
+        self.pivotMotorOne.setPIDValues(IntakeConstants.INTAKEPIVOT_P, 
+                                          IntakeConstants.INTAKEPIVOT_I, 
+                                          IntakeConstants.INTAKEPIVOT_D, 
+                                          IntakeConstants.INTAKEPIVOT_MAX_OUTPUT, 
+                                          IntakeConstants.INTAKEPIVOT_MIN_OUTPUT)
         
         # self.pivotMotorOne.setEncoderPositionConversion((1.0/60.0) * 360.0)
-        self.pivotMotorOne.setMotorBrake(True)
+        #self.pivotMotorOne.setMotorBrake(True)
         self.pivotMotorTwo.setMotorBrake(True)
         self.intakeMotor.setCurrentLimit(30)
-        # self.pivotMotorOne.save()
-        # self.pivotMotorTwo.save()
+        self.pivotMotorOne.save()
+        self.pivotMotorTwo.save()
         self.intakeMotor.save()
 
     def periodic(self):
@@ -41,7 +40,7 @@ class Intake(commands2.Subsystem):
         Sends subsystem info to console or smart dashboard
         """
         self.sd.putNumber("Intake Angle", self.getIntakeRPM())
-        #self.sd.putNumber("Intake Speed", self.getIntakePivotAngle())
+        self.sd.putNumber("Intake Speed", self.getIntakePivotAngle())
 
     def getIntakeRPM(self):
         return self.intakeMotor.getBuiltInEncoderVelocity()
@@ -53,8 +52,13 @@ class Intake(commands2.Subsystem):
         self.intakeMotor.setPower(power)
 
     def setPivotPosition(self, degrees):
-        self.pivotMotorOne.setPosition(degrees)
+        self.pivotMotorOne.setPosition(-degrees)
+        self.pivotMotorTwo.setPosition(degrees)
 
     def setPivotPower(self, power):
         self.pivotMotorOne.setPower(-power)
         self.pivotMotorTwo.setPower(power)
+
+    def resetPivotEncoder(self):
+        self.pivotMotorOne.seedBuiltInEncoder(0)
+        self.pivotMotorTwo.seedBuiltInEncoder(0)

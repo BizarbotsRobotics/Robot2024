@@ -70,6 +70,13 @@ class IntakeConstants:
 
     # Sets the absolute encoder port
     INTAKE_ENCODER_PORT = 4
+    #Intake Pivot Motor PID Constants
+    INTAKEPIVOT_P = 25
+    INTAKEPIVOT_I = 0
+    INTAKEPIVOT_D = .5
+    INTAKEPIVOT_FF = 0
+    INTAKEPIVOT_MIN_OUTPUT = -1
+    INTAKEPIVOT_MAX_OUTPUT = 1
 
 class ShooterConstants:
     SHOOTER_BOTTOM_ID = 13
@@ -102,20 +109,14 @@ class ShooterConstants:
     SHOOTERPIVOT_MAX_OUTPUT = 1
     
     #Indexer PID Constants
-    INDEXER_P = 1
+    INDEXER_P = 2
     INDEXER_I = 0
     INDEXER_D = 0
     INDEXER_FF = 0
-    INDEXER_MIN_OUTPUT = -.5
-    INDEXER_MAX_OUTPUT = .5
+    INDEXER_MIN_OUTPUT = -1
+    INDEXER_MAX_OUTPUT = 1
 
-    #Intake Pivot Motor PID Constants
-    INTAKEPIVOT_P = .01
-    INTAKEPIVOT_I = 0
-    INTAKEPIVOT_D = 0
-    INTAKEPIVOT_FF = 0
-    INTAKEPIVOT_MIN_OUTPUT = -1
-    INTAKEPIVOT_MAX_OUTPUT = 1
+
 
     
 

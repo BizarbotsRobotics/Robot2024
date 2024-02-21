@@ -7,10 +7,14 @@
 import enum
 
 import commands2
+from Commands.AdjustNoteCmd import AdjustNoteCmd
 from Commands.AmpScore import AmpScore
 from Commands.HoldNote import HoldNote
 from Commands.IntakeCmd import IntakeCmd
+from Commands.IntakeToShooter import IntakeToShooter
 from Commands.Shoot import Shoot
+from Commands.SpeakerShoot import SpeakerShoot
+from Commands.StartConfig import StartConfig
 from Subsystems.Drive.SwerveDrive import SwerveDrive
 from Subsystems.Shoober.Shoober import Shoober
 from Subsystems.Intake.Intake import Intake
@@ -82,17 +86,18 @@ class RobotContainer:
 
 
     def configureButtonBindings(self) -> None:
-        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kA).whileTrue(
-           Shoot(self.shoober) 
+        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kA).onTrue(
+            SpeakerShoot(self.shoober) 
+            #Shoot(self.shoober)
         )
 
         commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kB).onTrue(
-            IntakeCmd(self.conveyor, self.intake)
+            IntakeToShooter(self.intake, self.conveyor, self.shoober)
+           # AdjustNoteCmd(self.shoober)
         )
 
         commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kY).onTrue(
-            HoldNote(self.shoober, self.conveyor)
-
+            StartConfig(self.shoober, self.intake)
         )
         commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kX).onTrue(
             AmpScore(self.shoober)

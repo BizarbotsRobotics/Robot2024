@@ -4,56 +4,51 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+import ntcore
 import wpilib
 import commands2
-import commands2.cmd
+# import commands2.cmd
 import wpimath.controller
 from Subsystems.Shoober.Shoober import Shoober
-import constants
+
+# from Subsystems import SwerveDrive
+
+# import constants
 
 
-class AmpScore(commands2.Command):
+class AdjustNoteCmd(commands2.Command):
     """A command that will turn the robot to the specified angle."""
 
-    def __init__(self, shoober: Shoober) -> None:
+    def __init__(self, shoober:Shoober) -> None:
+        self.shoober = shoober
+
+        self.inst = ntcore.NetworkTableInstance.getDefault()
+        self.inst.startServer()
+        self.sd = self.inst.getTable("SmartDashboard")
+
         """
         Turns to robot to the specified angle.
 
         :param: targetAngleDegrees The angle to turn to
         :param: drive The drive subsystem to
         """
-        self.shoober = shoober
         super().__init__()
         self.addRequirements(self.shoober)
-        
 
     def initialize(self):
-        # self.shoober.setShooterMotorRPM(-3000)
-        # self.shoober.setPivotPosition(120)
-        self.run = True
-        self.timer = 0
-        self.timerTwo = 0
-
-        self.shoober.setPivotPosition(130)
-
+        """The initial subroutine of a command. Called once when the command is initially scheduled."""
+        self.shoober.resetPosition()
+        self.runCommand = False
+        
     def execute(self):
         """The main body of a command. Called repeatedly while the command is scheduled."""
-        if  self.shoober.getPivotAngle() > 129:
-            self.shoober.setBottomIndexerPower(-1)
-            self.shoober.setTopIndexerPower(1)
-            self.shoober.setShooterMotorPower(1)
-            self.timer += 1
-        
-
+        if -.1 < self.shoober.getIndexerPosition() < .1:
+            self.shoober.setDualIndexerPosition(-3)
+            self.runCommand = True
 
     def end(self, interrupted: bool):
         self.shoober.setDualIndexerPower(0)
-        # self.shoober.setPivotPower(0)
-        self.shoober.setShooterMotorPower(0)
-        self.shoober.setPivotPosition(0)
 
     def isFinished(self) -> bool:
         # End when the controller is at the reference.
-        if self.timer > 30:
-            return not self.shoober.getNoteStored()
-        return False
+        return self.shoober.getIndexerPosition() < -4 and self.runCommand

@@ -43,9 +43,9 @@ class MotorController:
         elif motorControllerType == MotorControllerType.FALCON:
             self.motor = TalonFX(motorID)
             self.cfg = phoenix6.configs.TalonFXConfiguration()
-            self.cfg.motor_output.neutral_mode = phoenix6.signals.NeutralModeValue.BRAKE
-            self.motor.configurator.apply(self.cfg)
-            self.controls = phoenix6.controls.DutyCycleOut(0)
+            self.cfg.motor_output.neutral_mode = phoenix6.signals.NeutralModeValue.COAST
+            self.request = phoenix6.controls.PositionDutyCycle(0)
+
         elif motorControllerType == MotorControllerType.VICTOR_SPX:
             self.motor = ctre.VictorSPX(motorID)
         elif motorControllerType == MotorControllerType.TALON_SRX:
@@ -67,7 +67,8 @@ class MotorController:
         if self.motorControllerType is MotorControllerType.SPARK_MAX:
             self.motor.set(power)
         else:
-            self.motor.set_control(self.controls.with_output(power))
+            pass
+            #self.motor.set_control(self.controls.with_o(power))
 
     def setInverted(self, invert):
         self.motor.setInverted(invert)
@@ -82,8 +83,7 @@ class MotorController:
         if self.motorControllerType is MotorControllerType.SPARK_MAX:
             self.__getPIDController__().setReference(position, rev.CANSparkMax.ControlType.kPosition)
         else:
-            self.motor.set(ctre.ControlMode.Position, position)
-
+            self.motor.set_control(self.request.with_position(20))
     def setVelocity(self, velocity):
         """
         Sets the velocity of the motor using the integrated PID controller.
@@ -102,7 +102,7 @@ class MotorController:
         else:
             return None
         
-    def setPIDValues(self, kf=0.0, kp=0.0, ki=0.0, kd=0.0, kMaxOut=1.0, kMinOut=-1.0):
+    def setPIDValues(self, kf=0.0, kp=0.0, ki=0.0, kd=0.1, kMaxOut=1.0, kMinOut=-1.0):
         """
         Sets the pid values using the integrated PID controller.
 
@@ -121,15 +121,9 @@ class MotorController:
             self.__getPIDController__().setD(kd)
             self.__getPIDController__().setOutputRange(kMinOut, kMaxOut)
         else:
-            self.motor.selectProfileSlot(0, 0)
-            self.motor.config_kF(0, kf)
-            self.motor.config_kP(0, kp)
-            self.motor.config_kI(0, ki)
-            self.motor.config_kD(0, kd)
-            self.motor.configNominalOutputForward(0, self.kTimeoutMs)
-            self.motor.configNominalOutputReverse(0, self.kTimeoutMs)
-            self.motor.configPeakOutputForward(kMaxOut, self.kTimeoutMs)
-            self.motor.configPeakOutputReverse(kMinOut, self.kTimeoutMs)
+            self.cfg.slot0.k_p = kp
+            self.cfg.slot0.k_i = ki
+            self.cfg.slot0.k_d = kd
     
     def getBuiltInEncoderPosition(self):
         """
@@ -141,7 +135,7 @@ class MotorController:
         if self.motorControllerType is MotorControllerType.SPARK_MAX:
             return self.encoder.getPosition()
         else:
-            return self.motor.getSelectedSensorPosition(0)
+            return self.motor.get_position().value_as_double
     
     def getBuiltInEncoderVelocity(self):
         """
@@ -193,6 +187,8 @@ class MotorController:
         """
         if self.motorControllerType is MotorControllerType.SPARK_MAX:
             self.motor.burnFlash()
+        else:
+            self.motor.configurator.apply(self.cfg)
 
     def seedBuiltInEncoder(self, position):
         """
@@ -202,9 +198,9 @@ class MotorController:
             position (float): position to be set.
         """
         if self.motorControllerType is MotorControllerType.SPARK_MAX:
-            print(self.encoder.setPosition(position))
+            self.encoder.setPosition(position)
         else:
-            self.motor.setSelectedSensorPosition(position)
+            self.motor.set_position(position)
 
     def setCurrentLimit(self, limit=50):
         """
@@ -322,7 +318,7 @@ class MotorController:
         return self.absoluteEncoder
     
     def resetPosition(self):
-        print("RESET:",self.encoder.setPosition(0))
+        self.encoder.setPosition(0)
 
     
 

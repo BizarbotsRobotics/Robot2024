@@ -79,6 +79,8 @@ class Shoober(Subsystem):
         self.shooterPivotMotorOne.setRampRate(20)
         self.shooterPivotMotorOne.setRampRate(20)
 
+        self.indexerMotorOne.setMotorBrake(True)
+        self.indexerMotorTwo.setMotorBrake(True)
         self.shooterMotorTop.save()
         self.shooterMotorBottom.save()
         self.indexerMotorOne.save()
@@ -103,6 +105,8 @@ class Shoober(Subsystem):
         self.sd.putNumber("robot distance", self.distance.get())
         self.sd.putNumber("indexer position", self.getIndexerPosition())
 
+        self.sd.putBoolean("AdjustNote", self.getIndexerPosition() < -4)
+
         pass
 
     # Function to set power on shooter motor
@@ -119,7 +123,8 @@ class Shoober(Subsystem):
         return self.shooterPivotMotorOne.getAbsoluteEncoderPosition() - 17.88
     
     def setPivotPower(self, power):
-        self.shooterPivotMotorOne.setPower(power)
+        if power > .05 or power < -.05:
+            self.shooterPivotMotorOne.setPower(power)
 
     def setPivotPosition(self, position):
         self.shooterPivotMotorOne.setPosition(position + 17.88)

@@ -27,18 +27,14 @@ class Shoot(commands2.Command):
         self.addRequirements(self.shoober)
 
     def initialize(self):
-        self.shoober.setShooterMotorRPM(-900)
+        self.shoober.setShooterMotorRPM(-2000)
         # self.shoober.setPivotPosition(0)
 
     def execute(self):
         """The main body of a command. Called repeatedly while the command is scheduled."""
-        if  self.shoober.getShooterRPM() < -800 and self.shoober.getPivotAngle() > 0:
+        if  self.shoober.getShooterRPM() < -1900:
             self.shoober.setDualIndexerPower(-1)
-            
-
         
-
-
     def end(self, interrupted: bool):
         self.shoober.setShooterMotorPower(0)
         self.shoober.setDualIndexerPower(0)
@@ -47,4 +43,4 @@ class Shoot(commands2.Command):
 
     def isFinished(self) -> bool:
         # End when the controller is at the reference.
-        return False
+        return  not self.shoober.getNoteStored()

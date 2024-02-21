@@ -30,24 +30,16 @@ class HoldNote(commands2.Command):
         """
         self.run = True
         super().__init__()
+        self.addRequirements(self.shoober, self.conveyor)
 
     def initialize(self):
         """The initial subroutine of a command. Called once when the command is initially scheduled."""
-        self.timer = 0
-
-        self.shoober.resetPosition()
-        self.shoober.setDualIndexerPosition(-5)
-
+        self.shoober.setPivotPosition(0)
     def execute(self):
         """The main body of a command. Called repeatedly while the command is scheduled."""
-        self.shoober.setDualIndexerPower(-.4)
-        self.conveyor.setConveyorPower(.8)
-
-        if self.timer > 20 and self.run:
-            self.shoober.setDualIndexerPower(0)
-            self.run = False
-        self.timer += 1
-
+        if self.shoober.getPivotAngle() < 5:
+            self.shoober.setDualIndexerPower(-.4)
+            self.conveyor.setConveyorPower(.8)
 
     def end(self, interrupted: bool):
         self.shoober.setDualIndexerPower(0)

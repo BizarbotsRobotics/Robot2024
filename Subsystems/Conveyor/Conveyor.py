@@ -40,7 +40,7 @@ class Conveyor(commands2.Subsystem):
         self.conveyorMotor.setPower(power)
 
     def getNoteStored(self):
-        if self.colorSensor.getProximity() > 400:
+        if self.colorSensor.getProximity() > 500:
             return True
         return False
 

@@ -46,9 +46,8 @@ class SwerveDrive(Subsystem):
         #self.pushOffsetsToControllers()
         
     def periodic(self):
-        self.enableTelemetry()
+        self.telemetry()
         self.updateOdometry()
-        pass
 
     def initializeModules(self):
         try:
@@ -64,7 +63,7 @@ class SwerveDrive(Subsystem):
             self.backRight = SwerveModule(SwerveConstants.BACK_RIGHT_DRIVE, SwerveConstants.BACK_RIGHT_SWERVE,
                                         SwerveConstants.BACK_RIGHT_ENCODER_PORT, SwerveConstants.BACK_RIGHT_ENCODER_OFFSET, 
                                         MotorControllerType.SPARK_MAX, True)
-            self.backRight.setDriveInverted()
+            #self.backRight.setDriveInverted()
             # self.backLeft.setDriveInverted()
             self.swerveModules = [self.frontLeft, self.frontRight, self.backLeft, self.backRight]
         except Exception as e:
@@ -107,7 +106,7 @@ class SwerveDrive(Subsystem):
     #     self.drive(velocity, isOpenLoop, centerOfRotationMeters)
 
     def driveFR(self, translationX, translationY, rotation, fieldRelative, isOpenLoop):
-        if translationX <= .1 and translationX >= -.1:
+        if translationX <= .02 and translationX >= -.02:
             translationX = 0
         
         if translationY <= .1 and translationY >= -.1:
@@ -243,12 +242,19 @@ class SwerveDrive(Subsystem):
         else:
             return geometry.Translation3d()
         
-    # Tells robot to not move
     def setMotorIdleMode(self, brake):
+        """
+        Sets the motor's brake mode
+
+        Args:
+            brake (bool): True for brake, False for idle
+        """
         for swerve in self.swerveModules:
             swerve.setMotorBrake(brake)
             
     def setMaxSpeed(self):
+        """_summary_
+        """
         self.maxSpeed = SwerveConstants.MAX_SPEED
 
     def getSwerveModulePoses(self, robotPose):
@@ -281,9 +287,11 @@ class SwerveDrive(Subsystem):
         return None
 
     def synchronizeModuleEncoders(self):
+        """
+        Loops through each swerve module and updates the relative encoder with the absolute encoders position.
+        """
         for swerve in self.swerveModules:
             swerve.queueSynchronizeEncoders()
-        #TODO add this method in swerve module class
 
 
     def lockPose(self):
@@ -302,19 +310,36 @@ class SwerveDrive(Subsystem):
             self.kinematics.toSwerveModuleStates(kinematics.ChassisSpeeds())
             counter+=1
 
-    def getSwerveDriveKinematics(self):
+    def getSwerveDriveKinematics(self) -> kinematics.SwerveDrive4Kinematics:
+        """
+        Return the Kinematics object for the current swerve drive using the values in our constants file.
+
+        Raises:
+            Exception: Constants are not set or not set correctly.
+
+        Returns:
+            kinematics.SwerveDrive4Kinematics : Swerve Drive Kinematics Object
+        """
         try:
             m_frontLeftLocation = geometry.Translation2d(SwerveConstants.FRONT_LEFT_CORDS['x'], SwerveConstants.BACK_LEFT_CORDS['y'])
             m_frontRightLocation = geometry.Translation2d(SwerveConstants.FRONT_RIGHT_CORDS['x'], SwerveConstants.FRONT_RIGHT_CORDS['y'])
             m_backLeftLocation = geometry.Translation2d(SwerveConstants.BACK_LEFT_CORDS['x'], SwerveConstants.BACK_LEFT_CORDS['y'])
             m_backRightLocation = geometry.Translation2d(SwerveConstants.BACK_RIGHT_CORDS['x'], SwerveConstants.BACK_RIGHT_CORDS['y'])
             return kinematics.SwerveDrive4Kinematics(m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation)
-        
         except Exception as e:
             raise Exception("Check your constants folder")
     
 
-    def getModulePositions(self, invertOdometry=False):
+    def getModulePositions(self, invertOdometry=False) -> tuple:
+        """
+        Returns the module position as a tuple.
+
+        Args:
+            invertOdometry (bool, optional): Inverts the odometry. Defaults to False.
+
+        Returns:
+            tuple: Position of the module.
+        """
         counter = 0
         positions = []
         for swerve in self.swerveModules:
@@ -323,12 +348,15 @@ class SwerveDrive(Subsystem):
                 positions[counter].distanceMeters *= -1
             counter+=1
         return tuple(positions)
-    
-    def pushOffsetsToControllers(self):
-        for swerve in self.swerveModules:
-            swerve.pushOffsetsToControllers()
 
     def addVisionMeasurement(self,robotPose, timestamp):
+        """
+        Adds vision measurements to make our odometry more accurate.
+
+        Args:
+            robotPose (_type_): _description_
+            timestamp (_type_): _description_
+        """
         self.swerveDrivePoseEstimator.addVisionMeasurement(robotPose, timestamp)
         newOdometry = geometry.Pose2d(self.swerveDrivePoseEstimator.getEstimatedPosition().translation(),
                                     robotPose.rotation()).translation()
@@ -336,15 +364,27 @@ class SwerveDrive(Subsystem):
         self.resetOdometry(newOdometry)
 
     def setGyroOffset(self, offset):
-      self.IMUOffset = offset
+        """
+        Sets an offest to the gyro.
+
+        Args:
+            offset (number): Offset to be set.
+        """
+        self.IMUOffset = offset
     
     def setGyro(self, gyro):
+        """
+        Sets the gyro offset.
+
+        Args:
+            gyro (_type_): _description_
+        """
         self.setGyroOffset(self.getIMURawRotational3d().minus(gyro))
 
-    def getTargetSpeeds(self, xInput, yInput, headingX, headingY):
-        pass
-
-    def enableTelemetry(self):
+    def telemetry(self):
+        """
+        Enables Debug in Driver Station
+        """
         for swerve in self.swerveModules:
             swerve.debug()
     
