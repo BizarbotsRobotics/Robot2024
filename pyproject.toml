@@ -15,11 +15,11 @@ robotpy_extras = [
     # "apriltag"
     "commands2",
     # "cscore"
-    # "navx"
-    # "pathplannerlib"
+    # "navx",
+    "pathplannerlib",
     "phoenix5",
     "phoenix6",
-    # "playingwithfusion"
+    "playingwithfusion",
     "rev"
     # "romi"
     # "sim"
@@ -27,4 +27,4 @@ robotpy_extras = [
 ]
 
 # Other pip packages to install
-requires = []
+requires = ["numpy"]

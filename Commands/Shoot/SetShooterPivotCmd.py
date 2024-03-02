@@ -9,13 +9,14 @@ import commands2
 import commands2.cmd
 import wpimath.controller
 from Subsystems.Shoober.Shoober import Shoober
+from Subsystems.Vision.Vision import Vision
 import constants
 
 
-class AmpScore(commands2.Command):
+class SetShooterPivotCmd(commands2.Command):
     """A command that will turn the robot to the specified angle."""
 
-    def __init__(self, shoober: Shoober) -> None:
+    def __init__(self, shoober: Shoober, vision: Vision) -> None:
         """
         Turns to robot to the specified angle.
 
@@ -23,37 +24,21 @@ class AmpScore(commands2.Command):
         :param: drive The drive subsystem to
         """
         self.shoober = shoober
+        self.vision = vision
         super().__init__()
         self.addRequirements(self.shoober)
-        
 
     def initialize(self):
-        # self.shoober.setShooterMotorRPM(-3000)
-        # self.shoober.setPivotPosition(120)
-        self.run = True
-        self.timer = 0
-        self.timerTwo = 0
-
-        self.shoober.setPivotPosition(130)
+        self.shoober.setPivotPosition(self.vision.getDesiredPivot())
 
     def execute(self):
+        self.shoober.setPivotPosition(self.vision.getDesiredPivot())
         """The main body of a command. Called repeatedly while the command is scheduled."""
-        if  self.shoober.getPivotAngle() > 129:
-            self.shoober.setBottomIndexerPower(-1)
-            self.shoober.setTopIndexerPower(1)
-            self.shoober.setShooterMotorPower(1)
-            self.timer += 1
+        pass
         
-
-
     def end(self, interrupted: bool):
-        self.shoober.setDualIndexerPower(0)
-        # self.shoober.setPivotPower(0)
-        self.shoober.setShooterMotorPower(0)
-        self.shoober.setPivotPosition(0)
+       pass
 
     def isFinished(self) -> bool:
         # End when the controller is at the reference.
-        if self.timer > 30:
-            return not self.shoober.getNoteStored()
-        return False
+        return  (self.vision.getDesiredPivot() -2) < self.shoober.getPivotAngle() < (self.vision.getDesiredPivot() + 2)

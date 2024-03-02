@@ -40,6 +40,7 @@ class MotorController:
             self.motor = rev.CANSparkMax(motorID,rev.CANSparkMax.MotorType.kBrushless)
             self.encoder = self.motor.getEncoder()
             self.pidController = self.motor.getPIDController()
+            self.motor.setControlFramePeriodMs(50)
         elif motorControllerType == MotorControllerType.FALCON:
             self.motor = TalonFX(motorID)
             self.cfg = phoenix6.configs.TalonFXConfiguration()
@@ -102,6 +103,9 @@ class MotorController:
         else:
             return None
         
+    def setPIDOutput(self, min, max):
+        self.__getPIDController__().setOutputRange(min, max)
+
     def setPIDValues(self, kf=0.0, kp=0.0, ki=0.0, kd=0.1, kMaxOut=1.0, kMinOut=-1.0):
         """
         Sets the pid values using the integrated PID controller.

@@ -7,14 +7,15 @@
 import enum
 
 import commands2
-from Commands.AdjustNoteCmd import AdjustNoteCmd
-from Commands.AmpScore import AmpScore
-from Commands.HoldNote import HoldNote
-from Commands.IntakeCmd import IntakeCmd
-from Commands.IntakeToShooter import IntakeToShooter
-from Commands.Shoot import Shoot
-from Commands.SpeakerShoot import SpeakerShoot
-from Commands.StartConfig import StartConfig
+from Commands.AmpScore.AmpScoreCmd import AmpScoreCmd
+from Commands.AmpScore.AutoAmpScoreCmd import AutoAmpScoreCmd
+from Commands.Hang.AutoHangCmd import AutoHangCmd
+from Commands.Hang.PrepareHangCmd import PrepareHangCmd
+from Commands.Intake.IntakeToShooterCmd import IntakeToShooterCmd
+from Commands.Shoot.DistanceShootCmd import DistanceShootCmd
+from Commands.Shoot.ShootCloseCmd import ShootCloseCmd
+from Commands.StartConfig.StartConfigCmd import StartConfigCmd
+from Commands.Test.shooterTestCmd import ShooterTestCmd
 from Subsystems.Drive.SwerveDrive import SwerveDrive
 from Subsystems.Shoober.Shoober import Shoober
 from Subsystems.Intake.Intake import Intake
@@ -23,6 +24,10 @@ import commands2
 from Util.MotorController import MotorController, MotorControllerType, MotorType
 import wpimath.controller
 import wpilib
+from pathplannerlib import path, auto
+from pathplannerlib import auto, config
+from Subsystems.Vision.Vision import Vision
+from constants import AutoConstants
 
 
 
@@ -50,57 +55,74 @@ class RobotContainer:
         self.conveyor = Conveyor()
         self.intake = Intake()
         self.shoober  = Shoober()
-        self.drive = SwerveDrive()
+        self.vision = Vision()
+        self.drive = SwerveDrive(self.vision)
+        
         self.driverController = wpilib.XboxController(0)
         self.operatorController = wpilib.XboxController(1)
 
         self.compressor = wpilib.Compressor(19,wpilib.PneumaticsModuleType.REVPH)
-        self.compressor.disable()
+        self.compressor.enableAnalog(30,60)
+        
         self.drive.setDefaultCommand(
             commands2.RunCommand(
                 lambda: self.drive.driveFR(self.driverController.getLeftY(), self.driverController.getLeftX(), self.driverController.getRightX(), False, True), self.drive
             )
         )
-        self.shoober.setDefaultCommand(
-            commands2.RunCommand(
-                lambda: self.shoober.setPivotPower(
-                    self.operatorController.getLeftY()),
-                self.shoober
-            )
-        )
+        
+        # self.shoober.setDefaultCommand(
+        #     ShooterTestCmd(self.shoober)
+        # )
 
-        # self.intake.setDefaultCommand(
+        # self.shoober.setDefaultCommand(
         #     commands2.RunCommand(
-        #         lambda: self.intake.setPivotPower(
-        #             self.operatorController.getRightY()),
-        #         self.intake
+        #         lambda: self.shoober.setPivotPower(
+        #             self.operatorController.getLeftY()),
+        #         self.shoober
         #     )
         # )
 
+        self.exampleTrigger = commands2.button.Trigger(self.vision.noteDetected)
 
         # Configure the button bindings
         self.configureButtonBindings()
 
-        
-
-
-
     def configureButtonBindings(self) -> None:
         commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kA).onTrue(
-            SpeakerShoot(self.shoober) 
-            #Shoot(self.shoober)
+            ShootCloseCmd(self.shoober)
         )
 
-        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kB).onTrue(
-            IntakeToShooter(self.intake, self.conveyor, self.shoober)
+        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kStart).onTrue(
+            commands2.RunCommand(
+                lambda: self.shoober.disengageLock(),
+                    self.shoober
+            )
+        ) 
+
+        self.exampleTrigger.onTrue(
+            IntakeToShooterCmd(self.intake, self.conveyor, self.shoober)
+        )
+
+        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kB).toggleOnTrue(
+            IntakeToShooterCmd(self.intake, self.conveyor, self.shoober)
            # AdjustNoteCmd(self.shoober)
         )
 
         commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kY).onTrue(
-            StartConfig(self.shoober, self.intake)
+            StartConfigCmd(self.intake, self.shoober)
         )
         commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kX).onTrue(
-            AmpScore(self.shoober)
+            AutoAmpScoreCmd(self.shoober)
+
+        )
+
+        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kRightBumper).onTrue(
+            PrepareHangCmd(self.shoober, self.intake)
+
+        )
+
+        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kLeftBumper).onTrue(
+            AutoHangCmd(self.shoober)
 
         )
         # commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kLeftBumper).onTrue(
@@ -132,4 +154,4 @@ class RobotContainer:
 
         :returns: the command to run in autonomous
         """
-        return None
+        return auto.AutoBuilder.followPath(path.PathPlannerPath.fromPathFile("New Path"))

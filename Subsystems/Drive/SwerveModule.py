@@ -1,9 +1,8 @@
 import math
-import rev
 import ntcore
 from wpilib import AnalogEncoder, AnalogInput, DriverStation, RobotController
 from wpimath import kinematics, geometry
-import wpilib
+from wpimath import filter
 from constants import SwerveConstants
 from Util.MotorController import MotorController, MotorControllerType, MotorType
 from enum import Enum
@@ -63,10 +62,10 @@ class SwerveModule:
                                       kMaxOut=SwerveConstants.SWERVE_MAX_OUTPUT)
 
         # Set PID Values
-        # self.driveMotor.setPIDValues(kf=SwerveConstants.DRIVE_FF, 
-        #                               kp=SwerveConstants.DRIVE_P, ki=SwerveConstants.DRIVE_I, 
-        #                               kd=SwerveConstants.DRIVE_D, kMinOut=SwerveConstants.DRIVE_MIN_OUTPUT, 
-        #                               kMaxOut=SwerveConstants.DRIVE_MAX_OUTPUT)
+        self.driveMotor.setPIDValues(kf=SwerveConstants.DRIVE_FF, 
+                                      kp=SwerveConstants.DRIVE_P, ki=SwerveConstants.DRIVE_I, 
+                                      kd=SwerveConstants.DRIVE_D, kMinOut=SwerveConstants.DRIVE_MIN_OUTPUT, 
+                                      kMaxOut=SwerveConstants.DRIVE_MAX_OUTPUT)
 
         # Saves settings to motor controllers
         self.driveMotor.save()

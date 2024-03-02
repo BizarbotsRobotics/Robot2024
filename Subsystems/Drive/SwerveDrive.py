@@ -1,16 +1,19 @@
 import ntcore
+from wpilib import DriverStation, Timer
 from Subsystems.Drive.SwerveModule import SwerveModule
 from Util.MotorController import MotorControllerType, MotorType
 from wpimath import geometry, kinematics, estimator, controller
-from constants import SwerveConstants
+from Subsystems.Vision.Vision import Vision
+from constants import AutoConstants, SwerveConstants
 import math
-from phoenix6.hardware import pigeon2
+from phoenix5.sensors import WPI_Pigeon2
 from commands2 import Subsystem
+from pathplannerlib import auto, config, controller
 
 class SwerveDrive(Subsystem):
-    def __init__(self):
+    def __init__(self, vision: Vision):
         super().__init__()
-
+        self.vision = vision
         inst = ntcore.NetworkTableInstance.getDefault()
         inst.startServer()
         self.sd = inst.getTable("SmartDashboard")
@@ -30,7 +33,7 @@ class SwerveDrive(Subsystem):
         # Counter that will signal when to update our encoders with the absolute encoders
         self.moduleSynchronizationCounter = 0
         
-        self.IMUOffset = 0
+        self.IMUOffset = geometry.Rotation3d()
         self.lastHeadingRadians = 0
         
         # Retrieve SwerveDrive Kinematic Object
@@ -43,10 +46,30 @@ class SwerveDrive(Subsystem):
             (0.9, 0.9, 0.9)
             #TODO Optimize these standard deviations later
            )
-        #self.pushOffsetsToControllers()
+        auto.AutoBuilder.configureHolonomic(
+            self.getPose, # Robot pose supplier
+            self.resetOdometry, # Method to reset odometry (will be called if your auto has a starting pose)
+            self.getRobotVelocity, # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            self.setChassisSpeeds, # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+            config.HolonomicPathFollowerConfig( # HolonomicPathFollowerConfig, this should likely live in your Constants class
+                controller.PIDConstants(5.0, 0.0, 0.0), # Translation PID constants
+                controller.PIDConstants(5.0, 0.0, 1), # Rotation PID constants
+                4.5, # Max module speed, in m/s
+                0.4, # Drive base radius in meters. Distance from robot center to furthest module.
+                config.ReplanningConfig() # Default path replanning config. See the API for the options here
+            ),
+            self.flipAlliance, # Supplier to control path flipping based on alliance color
+            self# Reference to this subsystem to set requirements
+        )
+
         
+    def flipAlliance(self):
+        alliance = DriverStation.getAlliance()
+        return alliance is DriverStation.Alliance.kRed
+    
     def periodic(self):
         self.telemetry()
+        #self.addVisionMeasurement()
         self.updateOdometry()
 
     def initializeModules(self):
@@ -63,26 +86,21 @@ class SwerveDrive(Subsystem):
             self.backRight = SwerveModule(SwerveConstants.BACK_RIGHT_DRIVE, SwerveConstants.BACK_RIGHT_SWERVE,
                                         SwerveConstants.BACK_RIGHT_ENCODER_PORT, SwerveConstants.BACK_RIGHT_ENCODER_OFFSET, 
                                         MotorControllerType.SPARK_MAX, True)
-            #self.backRight.setDriveInverted()
-            # self.backLeft.setDriveInverted()
             self.swerveModules = [self.frontLeft, self.frontRight, self.backLeft, self.backRight]
         except Exception as e:
             raise Exception("Check ports in constants file or check for Incorrect can IDs")
 
     def initializeIMU(self):
-        try:
-            self.imu = pigeon2(SwerveConstants.PIGEON_PORT) 
-            self.zeroGyro()
-        except Exception as e:
-            self.imu = None
+        self.imu = WPI_Pigeon2(SwerveConstants.PIGEON_PORT)
+        self.imu.reset()
+        
 
     def getIMURawRotational3d(self):
-        wxyz = []
-        self.imu.get6dQuaternion(wxyz)
+        wxyz = self.imu.get6dQuaternion()[1]
         return geometry.Rotation3d(geometry.Quaternion(wxyz[0], wxyz[1], wxyz[2], wxyz[3]))
     
     def getIMURotational3d(self):
-        return self.getRawRotation3d().rotateBy(self.IMUOffset)
+        return self.getIMURawRotational3d().rotateBy(self.IMUOffset)
   
     def driveFieldOriented(self, velocity, centerOfRotationMeters=None):
         fieldOrientedVelocity = kinematics.ChassisSpeeds.fromFieldRelativeSpeeds(velocity, self.yaw())
@@ -91,8 +109,8 @@ class SwerveDrive(Subsystem):
         else:
             self.drive(fieldOrientedVelocity, centerOfRotationMeters)
 
-    def drive(self,velocity):
-        self.drive(velocity, False, geometry.Translation2d())
+    def drivePathPlanner(self,velocity):
+        self.driveF(velocity, False, geometry.Translation2d())
     
     def drive(self, velocity, centerOfRotationMeters):
         self.drive(velocity, False, centerOfRotationMeters)
@@ -106,45 +124,58 @@ class SwerveDrive(Subsystem):
     #     self.drive(velocity, isOpenLoop, centerOfRotationMeters)
 
     def driveFR(self, translationX, translationY, rotation, fieldRelative, isOpenLoop):
-        if translationX <= .02 and translationX >= -.02:
+        if translationX < .05 and translationX > -.05:
             translationX = 0
-        
-        if translationY <= .1 and translationY >= -.1:
+
+        if translationY < .05 and translationY > -.05:
             translationY = 0
 
-        if rotation <= .1 and rotation >= -.1:
+        if rotation < .05 and rotation > -.05:
             rotation = 0
+        
 
-        translationX = translationX * 15
-        translationY = translationY * 15
-        rotation = rotation * 15
+        translationX = translationX * 4.5
+        translationY = translationY * 4.5
+        rotation = rotation * 4.5
 
-        self.sd.putNumber("translationX", translationX)
-        self.sd.putNumber("translationY", translationY)
-        self.sd.putNumber("Rotation", rotation)
         
         velocity = kinematics.ChassisSpeeds(translationX, translationY, rotation)
 
         self.driveF(velocity, True, geometry.Translation2d(0,0))
     
+    def limelight_aim_proportional(self):
+        kP = .01
+
+        targetingAngularVelocity = self.vision.getSpeakerCoords()[0] * kP
+        targetingAngularVelocity *= 1
+        targetingAngularVelocity *= -1.0
+
+        return targetingAngularVelocity
+
+    def limelight_range_proportional(self):    
+        kP = .01
+        targetingForwardSpeed = self.vision.getSpeakerCoords()[1] * kP
+        targetingForwardSpeed *= 1
+        targetingForwardSpeed *= -1.0
+        return targetingForwardSpeed
+
     def driveF(self, velocity, isOpenLoop, centerOfRotationMeters):
         
-        # if SwerveConstants.VELOCITY_CORRECTION:
-        #     dtConstant = 0.009
-        #     robotPoseVel = geometry.Pose2d(velocity.vx * dtConstant,
-        #                                     velocity.vy * dtConstant,
-        #                                     geometry.Rotation2d(velocity.omega * dtConstant))
-        #     twistVel = self.poseLock(robotPoseVel)
+        if SwerveConstants.VELOCITY_CORRECTION:
+            dtConstant = 0.009
+            robotPoseVel = geometry.Pose2d(velocity.vx * dtConstant,
+                                            velocity.vy * dtConstant,
+                                            geometry.Rotation2d(velocity.omega * dtConstant))
+            twistVel = self.poseLock(robotPoseVel)
 
-        #     velocity = kinematics.ChassisSpeeds(twistVel.dx / dtConstant, twistVel.dy / dtConstant,
-        #                                 twistVel.dtheta / dtConstant)
+            velocity = kinematics.ChassisSpeeds(twistVel.dx / dtConstant, twistVel.dy / dtConstant,
+                                        twistVel.dtheta / dtConstant)
         
-        # if SwerveConstants.HEADING_CORRECTION:
-        #     if abs(velocity.omega) < 0.01:
-        #         velocity.omega = self.headingPID.calculate(self.lastHeadingRadians, self.yaw().radians())
-        #     else:
-        #         self.lastHeadingRadians = self.yaw()
-
+        if SwerveConstants.HEADING_CORRECTION:
+            if abs(velocity.omega) < 0.01:
+                velocity.omega = self.headingPID.calculate(self.lastHeadingRadians, self.yaw().radians())
+            else:
+                self.lastHeadingRadians = self.yaw()
         swerveModuleStates = self.kinematics.toSwerveModuleStates(velocity, centerOfRotationMeters)
 
         self.setRawModuleStates(swerveModuleStates, isOpenLoop)
@@ -172,13 +203,14 @@ class SwerveDrive(Subsystem):
 
     def resetOdometry(self, pose):
         self.swerveDrivePoseEstimator.resetPosition(pose.rotation(), self.getModulePositions(), pose)
-        self.kinematics.toSwerveModuleStates(kinematics.ChassisSpeeds.freomFieldRelativeSpeeds(0, 0, 0, pose.rotation()))
+        self.kinematics.toSwerveModuleStates(kinematics.ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0, pose.rotation()))
 
 
     def getFieldVelocity(self):
         return kinematics.ChassisSpeeds.fromFieldRelativeSpeeds(self.kinematics.toChassisSpeeds(self.getStates()), self.yaw().unaryMinus())
 
     def getRobotVelocity(self):
+        print(self.kinematics.toChassisSpeeds(self.getStates()).vx)
         return self.kinematics.toChassisSpeeds(self.getStates())
     
     def getStates(self):
@@ -189,7 +221,6 @@ class SwerveDrive(Subsystem):
             counter+=1
         return states
     
-    # Cannot Drive Robot, Wheels Are Locked
     def poseLock(self, transform):
         kEps          = 1E-9
         dtheta        = transform.rotation().radians()
@@ -212,7 +243,7 @@ class SwerveDrive(Subsystem):
     # Basically a X-axis
     def yaw(self):
         if self.imu != None:
-            return geometry.Rotation2d(self.getIMURotational3d().getZ())
+            return geometry.Rotation2d(self.getIMURotational3d().Z().real)
         else:
             return geometry.Rotation2d()
         
@@ -349,7 +380,7 @@ class SwerveDrive(Subsystem):
             counter+=1
         return tuple(positions)
 
-    def addVisionMeasurement(self,robotPose, timestamp):
+    def addVisionMeasurement(self):
         """
         Adds vision measurements to make our odometry more accurate.
 
@@ -357,11 +388,14 @@ class SwerveDrive(Subsystem):
             robotPose (_type_): _description_
             timestamp (_type_): _description_
         """
-        self.swerveDrivePoseEstimator.addVisionMeasurement(robotPose, timestamp)
-        newOdometry = geometry.Pose2d(self.swerveDrivePoseEstimator.getEstimatedPosition().translation(),
-                                    robotPose.rotation()).translation()
-        self.setGyroOffset(geometry.Rotation3d(0, 0, robotPose.rotation().getRadians()))
-        self.resetOdometry(newOdometry)
+        visionPose = self.vision.getRobotPose()
+        if visionPose[0] != 0:
+            newPose = geometry.Pose2d(geometry.Translation2d(visionPose[0], visionPose[1]), geometry.Rotation2d.fromDegrees(visionPose[5]))
+            self.swerveDrivePoseEstimator.addVisionMeasurement(newPose, Timer.getFPGATimestamp())
+            newOdometry = geometry.Pose2d(self.swerveDrivePoseEstimator.getEstimatedPosition().translation(),
+                                        newPose.rotation()).translation()
+            self.setGyroOffset(geometry.Rotation3d(0, 0, newPose.rotation().getRadians()))
+            self.resetOdometry(newOdometry)
 
     def setGyroOffset(self, offset):
         """
@@ -387,6 +421,10 @@ class SwerveDrive(Subsystem):
         """
         for swerve in self.swerveModules:
             swerve.debug()
-    
+        
+        self.sd.putNumber("Pose X", self.getPose().X().real)
+        self.sd.putNumber("Pose Y", self.getPose().Y().real)
+        self.sd.putNumber("Pose Angle", self.getPose().rotation().degrees().real)
+        self.sd.putNumber("yaw", self.imu.getYaw())
 
         

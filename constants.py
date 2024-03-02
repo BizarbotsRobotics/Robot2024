@@ -1,6 +1,9 @@
+from pathplannerlib.controller import PIDConstants
+
+
 class SwerveConstants:
     # Max Speeds of drive modules
-    MAX_SPEED = 12
+    MAX_SPEED = 4.5
     ATTAINABLE_MAX_TRANSLATIONAL_SPEED_METERS_PER_SECOND = 0
     ATTAINABLE_MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND = 0
 
@@ -9,7 +12,7 @@ class SwerveConstants:
     DRIVE_ENCODER_CONVERSION_FACTOR = (1.0 / 6.75)
 
     # PIGEON 2 IMU ID
-    PIGEON_PORT = 2
+    PIGEON_PORT = 3
 
     # Coordinates of swer ve modules relative to the center of the robot
     FRONT_LEFT_CORDS = {'x':.381, 'y':.381}
@@ -49,6 +52,13 @@ class SwerveConstants:
     SWERVE_MIN_OUTPUT = -1
     SWERVE_MAX_OUTPUT = 1
 
+    DRIVE_P = 0
+    DRIVE_I = 0
+    DRIVE_D = 0
+    DRIVE_FF = .2
+    DRIVE_MIN_OUTPUT = -1
+    DRIVE_MAX_OUTPUT = 1
+
     # Velocity Correction
     VELOCITY_CORRECTION = False
     HEADING_CORRECTION = False
@@ -71,12 +81,17 @@ class IntakeConstants:
     # Sets the absolute encoder port
     INTAKE_ENCODER_PORT = 4
     #Intake Pivot Motor PID Constants
-    INTAKEPIVOT_P = 25
+    INTAKEPIVOT_P = .5
     INTAKEPIVOT_I = 0
-    INTAKEPIVOT_D = .5
+    INTAKEPIVOT_G = .1
+    INTAKEPIVOT_D = 0
     INTAKEPIVOT_FF = 0
     INTAKEPIVOT_MIN_OUTPUT = -1
     INTAKEPIVOT_MAX_OUTPUT = 1
+
+class AutoConstants:
+    TRANSLATION_PID = PIDConstants(0.7, 0, 0)
+    ANGLE_PID   = PIDConstants(0.4, 0, 0.01)
 
 class ShooterConstants:
     SHOOTER_BOTTOM_ID = 13
@@ -87,7 +102,7 @@ class ShooterConstants:
     INDEXER_2_ID = 18
 
     #Shooter PID Constants
-    SHOOTER_P = 0
+    SHOOTER_P = .0005
     SHOOTER_I = 0
     SHOOTER_D = 0
     SHOOTER_FF = .00018
@@ -101,9 +116,9 @@ class ShooterConstants:
     SHOOTER_ZERO = 0
 
     #Shooter Pivot PID Constants
-    SHOOTERPIVOT_P = .012
+    SHOOTERPIVOT_P = .02
     SHOOTERPIVOT_I = 0
-    SHOOTERPIVOT_D = 0
+    SHOOTERPIVOT_D = .006
     SHOOTERPIVOT_FF = 0
     SHOOTERPIVOT_MIN_OUTPUT = -1
     SHOOTERPIVOT_MAX_OUTPUT = 1
