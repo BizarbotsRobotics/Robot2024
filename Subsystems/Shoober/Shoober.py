@@ -21,15 +21,12 @@ class Shoober(Subsystem):
         self.sd = self.inst.getTable("SmartDashboard")
 
         tab = Shuffleboard.getTab("Shooter Testing")
-        self.p = tab.add("Kp", 0).getEntry()
-        self.i = tab.add("Ki", 0).getEntry()
-        self.d = tab.add("Kd", 0).getEntry()
-        self.f = tab.add("Kf", 0).getEntry()
 
         self.shooterDistances = [0, 5, 10, 15, 20, 25]
         self.shooterSpeeds = [2000, 2500, 3000, 3500, 4000, 4500]
         self.shooterAngles = [0, 20, 30, 40 , 50, 60]
 
+        self.pistonEnganged = False
         self.distance = wpilib.DigitalInput(9)
 
         self.pistonLock = wpilib.DoubleSolenoid(19, PneumaticsModuleType.REVPH, 0, 1)
@@ -192,9 +189,11 @@ class Shoober(Subsystem):
     
     def engageLock(self):
         self.pistonLock.set(wpilib.DoubleSolenoid.Value.kForward)
+        self.pistonEnganged = True
 
     def disengageLock(self):
         self.pistonLock.set(wpilib.DoubleSolenoid.Value.kReverse)
+        self.pistonEnganged = False
 
     def resetPosition(self):
         self.indexerMotorOne.resetPosition()

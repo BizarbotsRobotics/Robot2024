@@ -12,7 +12,7 @@ class IntakeStartPositionCmd(commands2.Command):
         self.addRequirements(self.intake)
 
     def initialize(self):
-        self.intake.resetPivotEncoder()
+        pass
             
     def end(self, interrupted: bool):
         self.intake.setPivotPower(0)

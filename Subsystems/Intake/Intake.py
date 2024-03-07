@@ -15,7 +15,7 @@ class Intake(commands2.Subsystem):
 
         self.pivotMotorOne = TalonFX(IntakeConstants.PIVOT_MOTOR_1)
         self.pivotMotorTwo = TalonFX(IntakeConstants.PIVOT_MOTOR_2)
-
+        self.intakeDown = False
         self.intakeMotor = MotorController(MotorControllerType.SPARK_MAX, MotorType.BRUSHLESS, IntakeConstants.INTAKE_MOTOR)
 
         self.cfg = phoenix6.configs.TalonFXConfiguration()
@@ -37,6 +37,7 @@ class Intake(commands2.Subsystem):
         self.intakeMotor.save()
         self.pivotMotorOne.configurator.apply(self.cfg)
         self.pivotMotorTwo.configurator.apply(self.cfg2)
+        self.resetPivotEncoder()
 
     def periodic(self):
         self.telemetry()

@@ -13,12 +13,13 @@ class PrepareHangCmd(commands2.Command):
         self.addRequirements(self.shoober)
 
     def initialize(self):
-        self.intake.resetPivotEncoder()
-        self.shoober.setPivotPosition(110)
+        self.intake.setPivotPosition(1)
+        self.shoober.disengageLock()
+        self.shoober.setPivotPosition(95)
 
     def execute(self):
-        self.intake.setPivotPosition(-12)
-        self.shoober.setPivotPosition(110)
+        self.intake.setPivotPosition(1)
+        self.shoober.setPivotPosition(95)
         pass
         
     def end(self, interrupted: bool):
@@ -26,4 +27,4 @@ class PrepareHangCmd(commands2.Command):
 
     def isFinished(self) -> bool:
         # End when the controller is at the reference.
-        return  self.shoober.getPivotAngle() > 108
+        return  self.shoober.getPivotAngle() > 94

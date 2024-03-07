@@ -43,9 +43,9 @@ class SwerveModule:
 
         # Set Encoder Conversion factors
         self.swerveMotor.setEncoderPositionConversion(SwerveConstants.SWERVE_ENCODER_CONVERSION_FACTOR)  
-        #self.driveMotor.setEncoderPositionConversion(SwerveConstants.DRIVE_ENCODER_CONVERSION_FACTOR)
-        # self.swerveMotor.setEncoderVelocityConversion(( SwerveConstants.SWERVE_ENCODER_CONVERSION_FACTOR * 360 ) / 60)  
-        # self.driveMotor.setEncoderVelocityConversion(SwerveConstants.DRIVE_ENCODER_CONVERSION_FACTOR / 60)
+        self.driveMotor.setEncoderPositionConversion(SwerveConstants.DRIVE_ENCODER_CONVERSION_FACTOR)
+        self.swerveMotor.setEncoderVelocityConversion(( SwerveConstants.SWERVE_ENCODER_CONVERSION_FACTOR * 360 ) / 60)  
+        self.driveMotor.setEncoderVelocityConversion(SwerveConstants.DRIVE_ENCODER_CONVERSION_FACTOR / 60)
 
        # self.swerveMotor.setEncoderInverted()       
         # Enable Position Wrapping From -180 to 180

@@ -9,7 +9,7 @@ class SwerveConstants:
 
     # Relative Encoder Conversion
     SWERVE_ENCODER_CONVERSION_FACTOR = (1.0 / ( 150.0 / 7.0 )) * 360
-    DRIVE_ENCODER_CONVERSION_FACTOR = (1.0 / 6.75)
+    DRIVE_ENCODER_CONVERSION_FACTOR = (1.0 / 6.75)/3.28
 
     # PIGEON 2 IMU ID
     PIGEON_PORT = 3
@@ -64,7 +64,7 @@ class SwerveConstants:
     HEADING_CORRECTION = False
 
     # Heading Correction PID
-    HEADING_P = 0
+    HEADING_P = .007
     HEADING_I = 0
     HEADING_D = 0
 
