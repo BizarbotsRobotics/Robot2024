@@ -20,14 +20,23 @@ class ShootCmd(commands2.Command):
         self.vision = vision
         self.shoober = shoober
         super().__init__()
+        self.counter = 0
         self.addRequirements(self.shoober)
 
     def initialize(self):
-        self.shoober.setShooterMotorRPM(self.vision.getDesiredShooterSpeed())
+        self.counter = 0
+        self.shoober.setShooterMotorPower(-1)
+        self.shoober.setPivotPosition(self.shoober.getDesiredPivot(self.vision.getSpeakerDistance()))
         # self.shoober.setPivotPosition(0)
 
     def execute(self):
-        if  self.shoober.getShooterRPM() < (self.vision.getDesiredShooterSpeed() + 200):
+        if self.shoober.getShooterRPM() > -10:
+            self.counter = self.counter + 1
+        if self.counter > 5:
+            self.shoober.resetPosition()
+            self.shoober.setDualIndexerPosition()
+            self.counter = 0
+        if  self.shoober.getShooterRPM() < -4500 and self.shoober.getPivotAngle() > self.shoober.getDesiredPivot(self.vision.getSpeakerDistance()) -1 :
             self.shoober.setDualIndexerPower(-1)
         
     def end(self, interrupted: bool):

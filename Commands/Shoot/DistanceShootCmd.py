@@ -12,4 +12,4 @@ class DistanceShootCmd(commands2.SequentialCommandGroup):
     def __init__(self, vision: Vision, drive: SwerveDrive, shoober: Shoober):
         super().__init__(
         )
-        self.addCommands(SwerveAlignLimelightCmd(drive, vision), SetShooterPivotCmd(shoober, vision), ShootCmd(shoober, vision))
+        self.addCommands(ShootCmd(shoober, vision))

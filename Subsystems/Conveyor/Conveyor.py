@@ -31,9 +31,10 @@ class Conveyor(commands2.Subsystem):
         """
         Sends subsystem info to console or smart dashboard
         """
-        self.sd.putNumber("Conveyor RPM", self.getConveyorRPM())
+        # self.sd.putNumber("Conveyor RPM", self.getConveyorRPM())
         self.sd.putBoolean("Note Stored", self.getNoteStored())
         self.sd.putNumber("Note Prox", self.prox)
+        pass
 
     def getConveyorRPM(self):
         return self.conveyorMotor.getBuiltInEncoderPosition()
@@ -46,7 +47,7 @@ class Conveyor(commands2.Subsystem):
         pass
 
     def getNoteStored(self):
-        if self.prox < 100:
+        if self.prox < 200:
             return True
         return False
 

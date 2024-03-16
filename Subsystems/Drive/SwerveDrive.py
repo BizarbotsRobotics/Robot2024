@@ -29,7 +29,7 @@ class SwerveDrive(Subsystem):
         # Create PID controller for heading correction
         self.headingPID = controller.PIDController(SwerveConstants.HEADING_P, SwerveConstants.HEADING_I, SwerveConstants.HEADING_D)
         self.headingPID.enableContinuousInput(0, 360)
-        self.headingPID.setTolerance(2,2)
+        self.headingPID.setTolerance(1,1)
         # Sets the max speed according to our constants file
         self.setMaxSpeed()
 
@@ -105,7 +105,6 @@ class SwerveDrive(Subsystem):
         return geometry.Rotation3d(geometry.Quaternion(wxyz[0], wxyz[1], wxyz[2], wxyz[3]))
     
     def getIMURotational3d(self):
-        return self.imu.get
         return self.getIMURawRotational3d().rotateBy(self.IMUOffset)
   
     def driveFieldOriented(self, velocity, centerOfRotationMeters=None):
@@ -177,11 +176,11 @@ class SwerveDrive(Subsystem):
             velocity = kinematics.ChassisSpeeds(twistVel.dx / dtConstant, twistVel.dy / dtConstant,
                                         twistVel.dtheta / dtConstant)
         
-        # if SwerveConstants.HEADING_CORRECTION:
-        #     if abs(velocity.omega) < 0.01:
-        #         velocity.omega = self.headingPID.calculate(self.lastHeadingRadians, self.yaw().radians())
-        #     else:
-        #         self.lastHeadingRadians = self.yaw()
+        if SwerveConstants.HEADING_CORRECTION:
+            if abs(velocity.omega) < 0.01:
+                velocity.omega = self.headingPID.calculate(self.lastHeadingRadians, self.yaw().radians())
+            else:
+                self.lastHeadingRadians = self.yaw()
         swerveModuleStates = self.kinematics.toSwerveModuleStates(velocity, centerOfRotationMeters)
 
         self.setRawModuleStates(swerveModuleStates, isOpenLoop)
@@ -249,10 +248,18 @@ class SwerveDrive(Subsystem):
     # Basically a X-axis
     def yaw(self):
         if self.imu != None:
-            return geometry.Rotation2d(self.getIMURotational3d().Z().real)
+            return geometry.Rotation2d(self.__get_gyro_heading(self.getIMURotational3d().Z().real))
         else:
             return geometry.Rotation2d()
-        
+
+    def __get_gyro_heading(self, angle) -> float:
+        angle = math.degrees(angle)
+        angle = math.fmod(-angle, 360)
+
+        if angle < 0:
+            return math.radians(angle if angle >= -180 else angle + 360)
+        else:
+            return math.radians(angle if angle <= 180 else angle - 360)
     # Z-axis
     def getPitch(self):
         if self.imu != None:
@@ -451,10 +458,10 @@ class SwerveDrive(Subsystem):
         for swerve in self.swerveModules:
             swerve.debug()
         
-        self.sd.putNumber("Pose X", self.getPose().X().real)
-        self.sd.putNumber("Pose Y", self.getPose().Y().real)
-        self.sd.putNumber("Pose Angle", self.getPose().rotation().degrees().real)
-        self.sd.putNumber("Speaker Distance", self.getDistanceFromSpeaker())
-        self.sd.putNumber("Speaker Angle", self.getAngleFromSpeaker())
+        # self.sd.putNumber("Pose X", self.getPose().X().real)
+        # self.sd.putNumber("Pose Y", self.getPose().Y().real)
+        # self.sd.putNumber("Pose Angle", self.getPose().rotation().degrees().real)
+        # self.sd.putNumber("Speaker Distance", self.getDistanceFromSpeaker())
+        # self.sd.putNumber("Speaker Angle", self.getAngleFromSpeaker())
 
         

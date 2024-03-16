@@ -10,6 +10,12 @@ import math
 import commands2
 from Commands.AmpScore.AmpScoreCmd import AmpScoreCmd
 from Commands.AmpScore.AutoAmpScoreCmd import AutoAmpScoreCmd
+from Commands.AmpScore.PrepareAmp import PrepareAmp
+from Commands.Autos.OneNote.OneNoteDriveCmd import OneNoteDriveCmd
+from Commands.Autos.OneNote.OneNoteGTFOCmd import OneNoteGTFOCmd
+from Commands.Autos.OneNote.OneNoteNoDriveCmd import OneNoteNoDriveCmd
+from Commands.Autos.ThreeNote.ThreeNoteAutoCmd import ThreeNoteAutoCmd
+from Commands.Autos.ThreeNote.ThreeNoteRightAutoCmd import ThreeNoteRightAutoCmd
 from Commands.Autos.TwoNote.TwoNoteAutoCmd import TwoNoteAutoCmd
 from Commands.Drive.DriveAmpCmd import DriveAmpCmd
 from Commands.Drive.DriveSpeakerCmd import DriveSpeakerCmd
@@ -22,6 +28,7 @@ from Commands.Intake.ManualIntakeInCmd import ManualIntakeInCmd
 from Commands.Intake.ManualIntakeOutCmd import ManualIntakeOutCmd
 from Commands.Intake.ToggleIntakeCmd import ToggleIntakeCmd
 from Commands.Shoot.DistanceShootCmd import DistanceShootCmd
+from Commands.Shoot.ShootAmpCmd import ShootAmpCmd
 from Commands.Shoot.ShootCloseCmd import ShootCloseCmd
 from Commands.StartConfig.StartConfigCmd import StartConfigCmd
 from Commands.Test.shooterTestCmd import ShooterTestCmd
@@ -78,7 +85,6 @@ class RobotContainer:
 
         self.compressor = wpilib.Compressor(19,wpilib.PneumaticsModuleType.REVPH)
         self.compressor.enableAnalog(30,60)
-
         # Drive Command = Drive Controller
         self.drive.setDefaultCommand(DriveCmd(self.drive, self.driverController.getLeftY, self.driverController.getLeftX, self.driverController.getRightX))
             # commands2.selectcommand.SelectCommand(
@@ -92,6 +98,9 @@ class RobotContainer:
             #     lambda: self.drive.driveFR(self.driverController.getLeftY(), self.driverController.getLeftX(), self.driverController.getRightX(), False, True), self.drive
             # )
         #)
+        # self.drive.setDefaultCommand(commands2.(DriveSpeakerCmd(self.drive, self.vision, self.driverController.getLeftY, self.driverController.getLeftX, self.driverController.getRightX),
+        #                              DriveCmd(self.drive, self.driverController.getLeftY, self.driverController.getLeftX, self.driverController.getRightX),
+        #                              self.getButtonDrive))
 
         
 
@@ -108,25 +117,24 @@ class RobotContainer:
         )
 
         self.noteTrigger = commands2.button.Trigger(self.vision.noteDetected)
-        self.opLeftYTrigger = commands2.button.Trigger(lambda: not (self.operatorController.getLeftY() < .1 and self.operatorController.getLeftY() > -.1))
-        self.opRightYTrigger = commands2.button.Trigger(lambda: not (self.operatorController.getRightY() < .1 and self.operatorController.getRightY() > -.1))
-        self.opBackTrigger = commands2.button.Trigger(lambda: not ( self.operatorController.getRightTriggerAxis() > .1 and self.operatorController.getRightTriggerAxis() > .1))
+        self.opLeftYTrigger = commands2.button.Trigger(lambda: not (self.operatorController.getLeftY() < .2 and self.operatorController.getLeftY() > -.2))
+        self.opRightYTrigger = commands2.button.Trigger(lambda: not (self.operatorController.getRightY() < .2 and self.operatorController.getRightY() > -.2))
+        self.opBackTrigger = commands2.button.Trigger(lambda: not ( self.operatorController.getRightTriggerAxis() > .2 and self.operatorController.getRightTriggerAxis() > .2))
 
         # Configure the button bindings
         self.configureButtonBindings()
         self.chooser = wpilib.SendableChooser()
-        self.chooser.setDefaultOption("One Note Drive Straight", None)
-        self.chooser.addOption("Two Note", TwoNoteAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
+        self.chooser.addOption("One Note GTFO (Right Speaker Angle)", OneNoteGTFOCmd(self.drive, self.shoober, self.intake, self.conveyor))
+        self.chooser.addOption("One Note Drive Straight", OneNoteDriveCmd(self.drive, self.shoober, self.intake, self.conveyor))
+        self.chooser.addOption("One Note No Drive", OneNoteNoDriveCmd(self.drive, self.shoober, self.intake, self.conveyor))
+
+        self.chooser.addOption("Two Note (Front Speaker)", TwoNoteAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
+        self.chooser.addOption("Two Note (Right Speaker)", TwoNoteAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
+        
+        self.chooser.addOption("Three Note", ThreeNoteAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
+        self.chooser.addOption("Three Note Right", ThreeNoteRightAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
 
         wpilib.SmartDashboard.putData("auto", self.chooser)
-
-    def getButtonDrive(self):
-        if self.driverController.getAButtonPressed():
-            return self.DriveSelector.DRIVESPEAKER
-        elif self.driverController.getBButton():
-            return self.DriveSelector.DRIVEAMP
-        else:
-            return self.DriveSelector.DRIVE
         
     def configureButtonBindings(self) -> None:
 
@@ -142,7 +150,11 @@ class RobotContainer:
 
         # Amp Score Command - B Button Operator
         commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kB).onTrue(
-            AutoAmpScoreCmd(self.shoober)
+            AmpScoreCmd(self.shoober)
+        )
+
+        commands2.button.JoystickButton(self.driverController, wpilib.XboxController.Button.kY).onTrue(
+            PrepareAmp(self.shoober)
         )
 
         # Shoot Speaker Far - Y Button Operator
@@ -207,10 +219,13 @@ class RobotContainer:
             )
         )
 
+        commands2.button.JoystickButton(self.driverController, wpilib.XboxController.Button.kA).whileTrue(
+            DriveSpeakerCmd(self.drive, self.vision, self.driverController.getLeftY, self.driverController.getLeftX, self.driverController.getRightX)
+        ) 
         # Auto Intake Command - Machine Learning
-        self.noteTrigger.onTrue(
-            IntakeToShooterCmd(self.intake, self.conveyor, self.shoober)
-        )
+        # self.noteTrigger.onTrue(
+        #     IntakeToShooterCmd(self.intake, self.conveyor, self.shoober)
+        # )
         
         """Use this method to define your button->command mappings. Buttons can be created by
         instantiating a {GenericHID} or one of its subclasses

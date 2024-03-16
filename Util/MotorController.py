@@ -40,7 +40,7 @@ class MotorController:
             self.motor = rev.CANSparkMax(motorID,rev.CANSparkMax.MotorType.kBrushless)
             self.encoder = self.motor.getEncoder()
             self.pidController = self.motor.getPIDController()
-            self.motor.setControlFramePeriodMs(50)
+            self.motor.setControlFramePeriodMs(70)
         elif motorControllerType == MotorControllerType.FALCON:
             self.motor = TalonFX(motorID)
             self.cfg = phoenix6.configs.TalonFXConfiguration()

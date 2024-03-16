@@ -16,7 +16,7 @@ class ResetCmd(commands2.Command):
     def initialize(self):
         pass
         self.drive.imu.reset()
-        self.drive.resetOdometry(geometry.Pose2d(geometry.Translation2d(.71, 4.4), geometry.Rotation2d(-2.61)))
+        self.drive.resetOdometry(geometry.Pose2d(geometry.Translation2d(1.36, 5.50), geometry.Rotation2d(math.radians(180))))
 
     def execute(self):
         pass

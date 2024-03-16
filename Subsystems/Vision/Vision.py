@@ -34,6 +34,9 @@ class Vision(commands2.Subsystem):
     def getSpeakerCoords(self):
         return [self.inst.getTable("limelight").getEntry("tx").getDouble(0), self.inst.getTable("limelight").getEntry("ty").getDouble(0)]
     
+    def seeTarget(self):
+        return self.inst.getTable("limelight").getEntry("tv").getInteger(0) != 0
+    
     def getAmpCoords(self):
         return [self.inst.getTable("limelight").getEntry("tx").getDouble(0), self.inst.getTable("limelight").getEntry("ty").getDouble(0)]
     
@@ -69,7 +72,7 @@ class Vision(commands2.Subsystem):
         distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / tan(angleToGoalRadians)
 
         return distanceFromLimelightToGoalInches
-    
+       
 
     
     def getRobotPose(self):

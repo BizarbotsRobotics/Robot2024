@@ -17,6 +17,7 @@ class HoldNoteCmd(commands2.Command):
 
     def initialize(self):
         self.shoober.setPivotPosition(0)
+        self.shoober.setShooterMotorPower(.05)
 
     def execute(self):
         if self.shoober.getPivotAngle() < 5:

@@ -64,9 +64,9 @@ class SwerveConstants:
     HEADING_CORRECTION = False
 
     # Heading Correction PID
-    HEADING_P = .007
+    HEADING_P = .008
     HEADING_I = 0
-    HEADING_D = 0
+    HEADING_D = 0.0005
 
 class ConveyorConstants:
     # Conveyor Motor ID
@@ -116,7 +116,7 @@ class ShooterConstants:
     SHOOTER_ZERO = 0
 
     #Shooter Pivot PID Constants
-    SHOOTERPIVOT_P = .02
+    SHOOTERPIVOT_P = .035
     SHOOTERPIVOT_I = 0
     SHOOTERPIVOT_D = .006
     SHOOTERPIVOT_FF = 0
@@ -124,7 +124,7 @@ class ShooterConstants:
     SHOOTERPIVOT_MAX_OUTPUT = 1
     
     #Indexer PID Constants
-    INDEXER_P = 2
+    INDEXER_P = 1.5
     INDEXER_I = 0
     INDEXER_D = 0
     INDEXER_FF = 0

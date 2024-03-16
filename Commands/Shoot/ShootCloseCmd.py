@@ -19,15 +19,23 @@ class ShootCloseCmd(commands2.Command):
     def __init__(self, shoober: Shoober) -> None:
         """ """
         self.shoober = shoober
+
         super().__init__()
         self.addRequirements(self.shoober)
 
     def initialize(self):
-        self.shoober.setShooterMotorPower(-1)
-        self.shoober.setPivotPosition(1)
+        self.counter = 0
+        self.shoober.setShooterMotorPower(-.7)
+        self.shoober.setPivotPosition(25)
 
     def execute(self):
-        if  self.shoober.getShooterRPM() < (-3000):
+        if self.shoober.getShooterRPM() > -10 :
+            self.counter += 1
+        if self.counter > 5:
+            self.shoober.resetPosition()
+            self.shoober.setDualIndexerPosition(1)
+            self.counter = 0
+        if  self.shoober.getShooterRPM() < (-1500) and self.shoober.getPivotAngle() > 24:
             self.shoober.setDualIndexerPower(-1)
         
     def end(self, interrupted: bool):

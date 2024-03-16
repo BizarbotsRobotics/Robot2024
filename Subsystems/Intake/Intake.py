@@ -1,9 +1,11 @@
 import commands2
 import ntcore
+import wpilib
 from Util.MotorController import MotorController, MotorControllerType, MotorType
 from constants import IntakeConstants
 from phoenix6.hardware import TalonFX
 import phoenix6
+import rev
 
 class Intake(commands2.Subsystem):
 
@@ -32,14 +34,19 @@ class Intake(commands2.Subsystem):
 
         self.pivotMotorTwo.set_control(self.request)
         self.pivotMotorTwo.set_control(phoenix6.controls.Follower(IntakeConstants.PIVOT_MOTOR_1, True))
-
         self.intakeMotor.setCurrentLimit(30)
         self.intakeMotor.save()
         self.pivotMotorOne.configurator.apply(self.cfg)
         self.pivotMotorTwo.configurator.apply(self.cfg2)
-        self.resetPivotEncoder()
+        self.pivotAbsoluteEncoder = wpilib.DutyCycleEncoder(8)
+        self.encoderCount = 0
+        self.setPivotEncoderVal(((1- self.pivotAbsoluteEncoder.getAbsolutePosition()) * 60))
+        #self.resetPivotEncoder()
 
     def periodic(self):
+        if self.encoderCount < 10:
+            self.setPivotEncoderVal(((1- self.pivotAbsoluteEncoder.getAbsolutePosition()) * 60))
+            self.encoderCount += 1
         self.telemetry()
 
     def telemetry(self):
@@ -47,8 +54,8 @@ class Intake(commands2.Subsystem):
         Sends subsystem info to console or smart dashboard
         """
         pass
-        # self.sd.putNumber("Intake Angle", self.getIntakeRPM())
-        # self.sd.putNumber("Intake Speed", self.getIntakePivotAngle())
+        # self.sd.putNumber("Intake Angle Absolute", self.pivotAbsoluteEncoder.getAbsolutePosition())
+        # self.sd.putNumber("Intake Angle", self.getIntakePivotAngle())
 
     def getIntakeRPM(self):
         return self.intakeMotor.getBuiltInEncoderVelocity()
@@ -65,5 +72,10 @@ class Intake(commands2.Subsystem):
     def setPivotPower(self, power):
         self.pivotMotorOne.set_control(phoenix6.controls.DutyCycleOut(power))
 
+    def setPivotEncoderVal(self, value):
+        self.pivotMotorOne.set_position(value)
+        self.pivotMotorTwo.set_position(value)
+
     def resetPivotEncoder(self):
-        self.pivotMotorOne.set_position(0)
+        pass
+        #self.pivotMotorOne.set_position(0)

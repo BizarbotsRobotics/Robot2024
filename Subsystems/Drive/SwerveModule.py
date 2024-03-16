@@ -27,9 +27,9 @@ class SwerveModule:
         self.driveMotor =  MotorController(motorControllerType, MotorType.BRUSHLESS, driveMotorId)
 
         self.swerveMotor.setCurrentLimit(50)
-        self.driveMotor.setCurrentLimit(50)
+        self.driveMotor.setCurrentLimit(45)
 
-        #self.swerveMotor.setRampRate(10)
+        #self.swerveMotor.setRampRate(3)
 
         # Get Absolute encoder
         self.swerveAbsoluteEncoder = AnalogEncoder(absoluteEncoderPort)
@@ -68,6 +68,7 @@ class SwerveModule:
                                       kMaxOut=SwerveConstants.DRIVE_MAX_OUTPUT)
 
         # Saves settings to motor controllers
+
         self.driveMotor.save()
         self.swerveMotor.save()
 
@@ -166,8 +167,8 @@ class SwerveModule:
         """
         Sends debug info to condole or smart dashboard
         """
-        self.sd.putNumber("Encoder "+ str(self.swerveMotorId), self.swerveMotor.getBuiltInEncoderPosition())
-        self.sd.putNumber("Absolute Encoder "+ str(self.swerveMotorId), self.getSwerveAbsolutePositionReal())
+        # self.sd.putNumber("Encoder "+ str(self.swerveMotorId), self.swerveMotor.getBuiltInEncoderPosition())
+        # self.sd.putNumber("Absolute Encoder "+ str(self.swerveMotorId), self.getSwerveAbsolutePositionReal())
         pass
 
     def getSwerveRelativePosition(self):

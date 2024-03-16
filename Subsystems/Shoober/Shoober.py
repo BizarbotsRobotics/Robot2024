@@ -22,9 +22,9 @@ class Shoober(Subsystem):
 
         tab = Shuffleboard.getTab("Shooter Testing")
 
-        self.shooterDistances = [0, 5, 10, 15, 20, 25]
-        self.shooterSpeeds = [2000, 2500, 3000, 3500, 4000, 4500]
-        self.shooterAngles = [0, 20, 30, 40 , 50, 60]
+        self.shooterDistances = [58, 78, 114, 132, 153, 172, 177, 193, 257]
+        self.shooterSpeeds = [-3000, -3500, -3700, -4000, -4500, -5000,-5000, -5000, -5500]
+        self.shooterAngles = [30, 35, 42, 48, 52 , 50, 52, 56, 60]
 
         self.pistonEnganged = False
         self.distance = wpilib.DigitalInput(9)
@@ -84,8 +84,6 @@ class Shoober(Subsystem):
         self.shooterPivotMotorOne.setMotorBrake(True)
         self.shooterPivotMotorTwo.setMotorBrake(True)
 
-        self.indexerMotorOne.setMotorBrake(True)
-        self.indexerMotorTwo.setMotorBrake(True)
         
         self.shooterPivotMotorOne.setRampRate(20)
         self.shooterPivotMotorOne.setRampRate(20)
@@ -112,14 +110,14 @@ class Shoober(Subsystem):
         """
         Sends subsystem info to console or smart dashboard
         """
-        self.sd.putNumber("Shoober RPM", self.getShooterRPM())
-        self.sd.putNumber("Shoober Angle", self.shooterPivotMotorOne.getAbsoluteEncoderPosition() - 60.88)
+        # self.sd.putNumber("Shoober RPM", self.getShooterRPM())
+        # self.sd.putNumber("Shoober Angle", self.shooterPivotMotorOne.getAbsoluteEncoderPosition() - 60.88)
         self.sd.putBoolean("Shooter Note Stored", self.getNoteStored())
 
-        self.sd.putNumber("robot distance", self.distance.get())
-        self.sd.putNumber("indexer position", self.getIndexerPosition())
+        # self.sd.putNumber("robot distance", self.distance.get())
+        # self.sd.putNumber("indexer position", self.getIndexerPosition())
 
-        self.sd.putBoolean("AdjustNote", self.getIndexerPosition() < -4)
+        # self.sd.putBoolean("AdjustNote", self.getIndexerPosition() < -4)
         pass
 
     # Function to set power on shooter motor
@@ -207,12 +205,17 @@ class Shoober(Subsystem):
         pass
 
     def getNoteStored(self):
-        if self.prox < 100:
+        if self.proxSensor.getRange() < 200:
             return True
         return False
     
     def getDesiredPivot(self, distance):
-        return numpy.interp(distance, self.shooterDistances, self.shooterAngles)
+        height = 54
+        pivot = math.atan(height/distance)
+        pivot = 90 - math.degrees(pivot) -30 
+        if pivot < 0 or pivot > 130:
+            pivot = 0
+        return pivot
     
     def getDesiredShooterSpeed(self, distance):   
         return numpy.interp(distance, self.shooterDistances, self.shooterSpeeds)

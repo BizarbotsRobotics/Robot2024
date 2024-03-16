@@ -28,15 +28,18 @@ class AmpScoreCmd(commands2.Command):
         self.timer = 0
         self.timerTwo = 0
 
-        self.shoober.setPivotPosition(130)
+        self.shoober.setPivotPosition(140)
+        self.shoober.resetPosition()
+        self.shoober.setDualIndexerPosition(-1)
 
     def execute(self):
         """The main body of a command. Called repeatedly while the command is scheduled."""
-        if  self.shoober.getPivotAngle() > 129:
+        if  self.shoober.getPivotAngle() > 139:
             self.shoober.setBottomIndexerPower(-1)
             self.shoober.setTopIndexerPower(1)
             self.shoober.setShooterMotorPower(1)
             self.timer += 1
+        
         
 
 

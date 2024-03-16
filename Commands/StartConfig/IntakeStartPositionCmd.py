@@ -18,8 +18,8 @@ class IntakeStartPositionCmd(commands2.Command):
         self.intake.setPivotPower(0)
 
     def isFinished(self) -> bool:
-        return self.intake.getIntakePivotAngle() > 14
+        return self.intake.getIntakePivotAngle() > 38
 
     def execute(self):
-        self.intake.setPivotPosition(15)
+        self.intake.setPivotPosition(40.5)
         

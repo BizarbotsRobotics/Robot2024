@@ -14,4 +14,4 @@ class AutoAmpScoreCmd(commands2.SequentialCommandGroup):
     def __init__(self, shoober: Shoober):
         super().__init__(
         )
-        self.addCommands(AmpScoreCmd(shoober), TurnOffPivotCmd(shoober))
+        self.addCommands(AmpScoreCmd(shoober), TurnOffPivotCmd(shoober).withTimeout(1))
