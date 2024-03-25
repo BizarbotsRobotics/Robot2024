@@ -16,7 +16,7 @@ class ShooterHoldPositionCmd(commands2.Command):
         self.addRequirements(self.shoober)
 
     def initialize(self):
-        self.shoober.setPivotPosition(100)
+        self.shoober.setPivotPosition(120)
 
     def execute(self):
         pass

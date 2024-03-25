@@ -15,6 +15,7 @@ from Commands.Autos.OneNote.OneNoteDriveCmd import OneNoteDriveCmd
 from Commands.Autos.OneNote.OneNoteGTFOCmd import OneNoteGTFOCmd
 from Commands.Autos.OneNote.OneNoteNoDriveCmd import OneNoteNoDriveCmd
 from Commands.Autos.ThreeNote.ThreeNoteAutoCmd import ThreeNoteAutoCmd
+from Commands.Autos.ThreeNote.ThreeNoteAutoStageCmd import ThreeNoteAutoStageCmd
 from Commands.Autos.ThreeNote.ThreeNoteRightAutoCmd import ThreeNoteRightAutoCmd
 from Commands.Autos.TwoNote.TwoNoteAutoCmd import TwoNoteAutoCmd
 from Commands.Drive.DriveAmpCmd import DriveAmpCmd
@@ -28,6 +29,7 @@ from Commands.Intake.ManualIntakeInCmd import ManualIntakeInCmd
 from Commands.Intake.ManualIntakeOutCmd import ManualIntakeOutCmd
 from Commands.Intake.ToggleIntakeCmd import ToggleIntakeCmd
 from Commands.Shoot.DistanceShootCmd import DistanceShootCmd
+from Commands.Shoot.PassCmd import PassCmd
 from Commands.Shoot.ShootAmpCmd import ShootAmpCmd
 from Commands.Shoot.ShootCloseCmd import ShootCloseCmd
 from Commands.StartConfig.StartConfigCmd import StartConfigCmd
@@ -86,7 +88,8 @@ class RobotContainer:
         self.compressor = wpilib.Compressor(19,wpilib.PneumaticsModuleType.REVPH)
         self.compressor.enableAnalog(30,60)
         # Drive Command = Drive Controller
-        self.drive.setDefaultCommand(DriveCmd(self.drive, self.driverController.getLeftY, self.driverController.getLeftX, self.driverController.getRightX))
+
+        self.drive.setDefaultCommand(DriveCmd(self.drive, self.driverController.getLeftY, self.driverController.getRightX, self.driverController.getLeftX))
             # commands2.selectcommand.SelectCommand(
             #     {
             #        self.DriveSelector.DRIVE: DriveCmd(self.drive, self.driverController.getLeftY, self.driverController.getLeftX, self.driverController.getRightX),
@@ -108,13 +111,13 @@ class RobotContainer:
         #     ShooterTestCmd(self.shoober)
         # )
 
-        self.shoober.setDefaultCommand(
-            commands2.RunCommand(
-                lambda: self.shoober.setPivotPower(
-                    self.operatorController.getLeftY()),
-                self.shoober
-            )
-        )
+        # self.shoober.setDefaultCommand(
+        #     commands2.RunCommand(
+        #         lambda: self.shoober.setPivotPower(
+        #             self.operatorController.getLeftY()),
+        #         self.shoober
+        #     )
+        # )
 
         self.noteTrigger = commands2.button.Trigger(self.vision.noteDetected)
         self.opLeftYTrigger = commands2.button.Trigger(lambda: not (self.operatorController.getLeftY() < .2 and self.operatorController.getLeftY() > -.2))
@@ -133,6 +136,8 @@ class RobotContainer:
         
         self.chooser.addOption("Three Note", ThreeNoteAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
         self.chooser.addOption("Three Note Right", ThreeNoteRightAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
+
+        self.chooser.addOption("Three Note Stage", ThreeNoteAutoStageCmd(self.drive, self.shoober, self.intake, self.conveyor))
 
         wpilib.SmartDashboard.putData("auto", self.chooser)
         
@@ -158,9 +163,9 @@ class RobotContainer:
         )
 
         # Shoot Speaker Far - Y Button Operator
-        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kY).onTrue(
-            DistanceShootCmd(self.vision, self.drive, self.shoober)
-        )
+        # commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kY).onTrue(
+        #     DistanceShootCmd(self.vision, self.drive, self.shoober)
+        # )
 
         # Toggle Piston Lock - Back Button Operator
         commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kBack).onTrue(
@@ -179,14 +184,15 @@ class RobotContainer:
 
         # Climb Command - POV Down Operator
         commands2.button.povbutton.POVButton(self.operatorController, 180).onTrue(
-            AutoHangCmd(self.shoober)
+            AutoHangCmd(self.shoober, self.intake)
+            
         )
 
         # Manual Pivot Command - Right Y axis
         self.opRightYTrigger.onTrue(
             commands2.RunCommand(
                 lambda: self.shoober.setPivotPower(
-                    self.operatorController.getRightY()),
+                    -self.operatorController.getRightY()),
                 self.shoober
             )
         )
@@ -208,6 +214,10 @@ class RobotContainer:
         # Manual Intake Out - Left Back Bumper
         commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kLeftBumper).whileTrue(
             ManualIntakeOutCmd(self.conveyor, self.intake)
+        ) 
+
+        commands2.button.JoystickButton(self.driverController, wpilib.XboxController.Button.kStart).onTrue(
+            PassCmd(self.shoober, self.vision)
         ) 
 
         # Manual Shooter Command - Back Trigger

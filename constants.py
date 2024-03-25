@@ -52,9 +52,9 @@ class SwerveConstants:
     SWERVE_MIN_OUTPUT = -1
     SWERVE_MAX_OUTPUT = 1
 
-    DRIVE_P = 0
-    DRIVE_I = 0
-    DRIVE_D = 0
+    DRIVE_P = 0.00023
+    DRIVE_I = 0.0000002
+    DRIVE_D = .02
     DRIVE_FF = .2
     DRIVE_MIN_OUTPUT = -1
     DRIVE_MAX_OUTPUT = 1
@@ -64,7 +64,7 @@ class SwerveConstants:
     HEADING_CORRECTION = False
 
     # Heading Correction PID
-    HEADING_P = .008
+    HEADING_P = .01
     HEADING_I = 0
     HEADING_D = 0.0005
 

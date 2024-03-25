@@ -30,15 +30,15 @@ class AmpScoreCmd(commands2.Command):
 
         self.shoober.setPivotPosition(140)
         self.shoober.resetPosition()
-        self.shoober.setDualIndexerPosition(-1)
+        self.shoober.setDualIndexerPosition(-10)
 
     def execute(self):
         """The main body of a command. Called repeatedly while the command is scheduled."""
-        if  self.shoober.getPivotAngle() > 139:
+        if  self.shoober.getPivotAngle() > 139 and self.shoober.getIndexerPosition() < -9.8:
             self.shoober.setBottomIndexerPower(-1)
             self.shoober.setTopIndexerPower(1)
             self.shoober.setShooterMotorPower(1)
-            self.timer += 1
+        self.timer += 1
         
         
 
@@ -47,12 +47,10 @@ class AmpScoreCmd(commands2.Command):
         self.shoober.setDualIndexerPower(0)
         # self.shoober.setPivotPower(0)
         self.shoober.setShooterMotorPower(0)
-        self.shoober.decreasePIDPower()
         self.shoober.setPivotPosition(2)
-        self.shoober.increasePIDPower()
 
     def isFinished(self) -> bool:
         # End when the controller is at the reference.
-        if self.timer > 30:
+        if self.timer > 20:
             return not self.shoober.getNoteStored()
         return False

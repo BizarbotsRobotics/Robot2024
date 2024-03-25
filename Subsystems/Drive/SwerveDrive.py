@@ -28,8 +28,8 @@ class SwerveDrive(Subsystem):
 
         # Create PID controller for heading correction
         self.headingPID = controller.PIDController(SwerveConstants.HEADING_P, SwerveConstants.HEADING_I, SwerveConstants.HEADING_D)
-        self.headingPID.enableContinuousInput(0, 360)
-        self.headingPID.setTolerance(1,1)
+        self.headingPID.enableContinuousInput(-30, 30)
+        self.headingPID.setTolerance(.1,.1)
         # Sets the max speed according to our constants file
         self.setMaxSpeed()
 
@@ -107,28 +107,7 @@ class SwerveDrive(Subsystem):
     def getIMURotational3d(self):
         return self.getIMURawRotational3d().rotateBy(self.IMUOffset)
   
-    def driveFieldOriented(self, velocity, centerOfRotationMeters=None):
-        fieldOrientedVelocity = kinematics.ChassisSpeeds.fromFieldRelativeSpeeds(velocity, self.yaw())
-        if centerOfRotationMeters is None:
-            self.drive(fieldOrientedVelocity)
-        else:
-            self.drive(fieldOrientedVelocity, centerOfRotationMeters)
-
-    def drivePathPlanner(self,velocity):
-        self.driveF(velocity, False, geometry.Translation2d())
-    
-    def drive(self, velocity, centerOfRotationMeters):
-        self.drive(velocity, False, centerOfRotationMeters)
-
-    # def drive(self, translation, rotation, fieldRelative, isOpenLoop, centerOfRotationMeters):
-    #     if fieldRelative:
-    #         velocity = kinematics.ChassisSpeeds.fromFieldRelativeSpeeds(translation.x, translation.y, rotation, self.yaw())
-    #     else:
-    #         velocity = kinematics.ChassisSpeeds(translation.x, translation.y, rotation)
-
-    #     self.drive(velocity, isOpenLoop, centerOfRotationMeters)
-
-    def driveFR(self, translationX, translationY, rotation, fieldRelative, isOpenLoop):
+    def driveFO(self, translationX, translationY, rotation, centerOfRotationMeters=None):
         if translationX < .05 and translationX > -.05:
             translationX = 0
 
@@ -142,6 +121,54 @@ class SwerveDrive(Subsystem):
         translationX = translationX * 4.5
         translationY = translationY * 4.5
         rotation = rotation * 4.5
+
+        
+        velocity = kinematics.ChassisSpeeds(translationX, translationY, rotation)
+
+        fieldOrientedVelocity = kinematics.ChassisSpeeds.fromFieldRelativeSpeeds(velocity, self.yaw())
+        if centerOfRotationMeters is None:
+            self.driveF(fieldOrientedVelocity, True, geometry.Translation2d(0,0))
+        else:
+            self.driveF(fieldOrientedVelocity, True, centerOfRotationMeters)
+
+    def drivePathPlanner(self,velocity):
+        self.driveF(velocity, False, geometry.Translation2d())
+    
+    def drive(self, velocity, centerOfRotationMeters):
+        self.driveF(velocity, False, centerOfRotationMeters)
+
+    # def drive(self, translation, rotation, fieldRelative, isOpenLoop, centerOfRotationMeters):
+    #     if fieldRelative:
+    #         velocity = kinematics.ChassisSpeeds.fromFieldRelativeSpeeds(translation.x, translation.y, rotation, self.yaw())
+    #     else:
+    #         velocity = kinematics.ChassisSpeeds(translation.x, translation.y, rotation)
+
+    #     self.drive(velocity, isOpenLoop, centerOfRotationMeters)
+
+    def driveFR(self, translationX, translationY, rotation, fieldRelative, isOpenLoop):
+        negative = False
+        if rotation < 0:
+            negative = True
+        
+        rotation = math.pow(6, math.fabs(rotation) - 1) - .1
+        if translationX < .05 and translationX > -.05:
+            translationX = 0
+
+        if translationY < .05 and translationY > -.05:
+            translationY = 0
+
+        if rotation < .25 and rotation > -.25:
+            rotation = 0
+        
+
+        translationX = translationX * 4.5
+        translationY = translationY * 4.5
+
+        if negative:
+            rotation = -rotation
+
+        rotation = rotation * 4.5
+        
 
         
         velocity = kinematics.ChassisSpeeds(translationX, translationY, rotation)
@@ -449,7 +476,7 @@ class SwerveDrive(Subsystem):
     def headingCalculate(self, targetHeadingAngleRadians):
         self.sd.putNumber("current heading", self.currentHeading)
         self.sd.putNumber("target heading", targetHeadingAngleRadians)
-        return -self.headingPID.calculate(self.getPose().rotation().rotateBy(geometry.Rotation2d(math.pi)).degrees().real, targetHeadingAngleRadians)
+        return -self.headingPID.calculate(self.getPose().rotation().rotateBy(geometry.Rotation2d(math.pi)).radians().real, targetHeadingAngleRadians)
 
     def telemetry(self):
         """
@@ -460,7 +487,8 @@ class SwerveDrive(Subsystem):
         
         # self.sd.putNumber("Pose X", self.getPose().X().real)
         # self.sd.putNumber("Pose Y", self.getPose().Y().real)
-        # self.sd.putNumber("Pose Angle", self.getPose().rotation().degrees().real)
+        self.sd.putNumber("Pose Angle", self.getPose().rotation().degrees().real)
+        self.sd.putNumber("Gyro Angle Angle", self.yaw().degrees().real)
         # self.sd.putNumber("Speaker Distance", self.getDistanceFromSpeaker())
         # self.sd.putNumber("Speaker Angle", self.getAngleFromSpeaker())
 

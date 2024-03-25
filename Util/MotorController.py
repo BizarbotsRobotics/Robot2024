@@ -1,3 +1,4 @@
+import math
 import rev
 import rev
 from phoenix6.hardware import TalonFX
@@ -235,7 +236,8 @@ class MotorController:
         #TODO Implement with CTRE devices
         self.positionWrapping = True
 
-    def setPIDEncoder(self, encoder=None):
+    def setPIDEncoder(self, 
+    encoder=None):
         """
         Sets the encoder to be used in the integrated PID Controller
 
@@ -316,7 +318,13 @@ class MotorController:
         self.__getPIDController__().setFeedbackDevice(self.absoluteEncoder)
 
     def getAbsoluteEncoderPosition(self):
-        return self.absoluteEncoder.getPosition()
+        angle = self.absoluteEncoder.getPosition()
+        angle = math.fmod(+angle, 360)
+        if angle < 0:
+            return angle if angle >= -180 else angle + 360
+        else:
+            return angle if angle <= 180 else angle - 360
+        
     
     def getAbsoluteEncoder(self):
         return self.absoluteEncoder

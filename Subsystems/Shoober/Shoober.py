@@ -84,6 +84,7 @@ class Shoober(Subsystem):
         self.shooterPivotMotorOne.setMotorBrake(True)
         self.shooterPivotMotorTwo.setMotorBrake(True)
 
+        self.shooterPivotMotorOne.setPositionPIDWrapping(True,-180,180)
         
         self.shooterPivotMotorOne.setRampRate(20)
         self.shooterPivotMotorOne.setRampRate(20)
@@ -111,7 +112,8 @@ class Shoober(Subsystem):
         Sends subsystem info to console or smart dashboard
         """
         # self.sd.putNumber("Shoober RPM", self.getShooterRPM())
-        # self.sd.putNumber("Shoober Angle", self.shooterPivotMotorOne.getAbsoluteEncoderPosition() - 60.88)
+
+        #self.sd.putNumber("Shoober Angle", self.getPivotAngle())
         self.sd.putBoolean("Shooter Note Stored", self.getNoteStored())
 
         # self.sd.putNumber("robot distance", self.distance.get())
@@ -131,13 +133,22 @@ class Shoober(Subsystem):
         return self.shooterMotorBottom.getBuiltInEncoderVelocity()
     
     def getPivotAngle(self):
-        return self.shooterPivotMotorOne.getAbsoluteEncoderPosition() - 60.88
+        return self.shooterPivotMotorOne.getAbsoluteEncoderPosition()
     
     def setPivotPower(self, power):
         if power < .05 and power > -.05:
             self.shooterPivotMotorOne.setPower(0)
         else:
             self.shooterPivotMotorOne.setPower(power)
+
+    def setPivotPositionAggressive(self, position):
+        self.shooterPivotMotorOne.setPIDValues(ShooterConstants.SHOOTERPIVOT_FF, 
+                                    .05, 
+                                    ShooterConstants.SHOOTERPIVOT_I, 
+                                    ShooterConstants.SHOOTERPIVOT_D, 
+                                    ShooterConstants.SHOOTERPIVOT_MAX_OUTPUT, 
+                                    ShooterConstants.SHOOTERPIVOT_MIN_OUTPUT)
+        self.shooterPivotMotorOne.setPosition(position)
 
     def setPivotPosition(self, position):
         self.shooterPivotMotorOne.setPIDValues(ShooterConstants.SHOOTERPIVOT_FF, 
@@ -146,16 +157,16 @@ class Shoober(Subsystem):
                                     ShooterConstants.SHOOTERPIVOT_D, 
                                     ShooterConstants.SHOOTERPIVOT_MAX_OUTPUT, 
                                     ShooterConstants.SHOOTERPIVOT_MIN_OUTPUT)
-        self.shooterPivotMotorOne.setPosition(position + 60.88)
+        self.shooterPivotMotorOne.setPosition(position)
 
     def setPivotPositionLowPower(self, position):
         self.shooterPivotMotorOne.setPIDValues(ShooterConstants.SHOOTERPIVOT_FF, 
-                                    ShooterConstants.SHOOTERPIVOT_P, 
+                                    .026, 
                                     ShooterConstants.SHOOTERPIVOT_I, 
-                                    ShooterConstants.SHOOTERPIVOT_D, 
-                                    .5, 
-                                    -.5)
-        self.shooterPivotMotorOne.setPosition(position + 60.88)
+                                    .005, 
+                                    1, 
+                                    -1)
+        self.shooterPivotMotorOne.setPosition(position)
 
     def setDualIndexerPower(self, power):
         self.indexerMotorOne.setPower(power)
@@ -210,9 +221,9 @@ class Shoober(Subsystem):
         return False
     
     def getDesiredPivot(self, distance):
-        height = 54
+        height = 56
         pivot = math.atan(height/distance)
-        pivot = 90 - math.degrees(pivot) -30 
+        pivot = 90 - math.degrees(pivot) - 30 
         if pivot < 0 or pivot > 130:
             pivot = 0
         return pivot

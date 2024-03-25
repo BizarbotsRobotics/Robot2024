@@ -63,8 +63,8 @@ class Vision(commands2.Subsystem):
         return distanceFromLimelightToGoalInches
     
     def getSpeakerDistance(self):
-        limelightMountAngleDegrees = 25.0
-        limelightLensHeightInches = 12.0
+        limelightMountAngleDegrees = 10.0
+        limelightLensHeightInches = 15.0
         goalHeightInches = 57
         angleToGoalDegrees = limelightMountAngleDegrees + self.getAmpCoords()[1]
         angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0)

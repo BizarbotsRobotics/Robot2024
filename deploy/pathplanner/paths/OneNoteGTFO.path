@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "OneNote",
   "previewStartingState": {
     "rotation": 120.57922687248902,
     "velocity": 0

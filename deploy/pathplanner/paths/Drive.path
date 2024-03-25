@@ -16,11 +16,11 @@
     },
     {
       "anchor": {
-        "x": 4.370547970767837,
+        "x": 3.1174884603692163,
         "y": 5.5
       },
       "prevControl": {
-        "x": 4.558019884173202,
+        "x": 3.3049603737745823,
         "y": 5.480266114378383
       },
       "nextControl": null,
@@ -32,7 +32,7 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.5,
+    "maxVelocity": 2.0,
     "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "OneNote",
   "previewStartingState": {
     "rotation": 177.07138784221436,
     "velocity": 0

@@ -20,7 +20,7 @@ class HoldNoteCmd(commands2.Command):
         self.shoober.setShooterMotorPower(.05)
 
     def execute(self):
-        if self.shoober.getPivotAngle() < 5:
+        if self.shoober.getPivotAngle() < 1:
             self.shoober.setDualIndexerPower(-.7)
             self.conveyor.setConveyorPower(1)
 

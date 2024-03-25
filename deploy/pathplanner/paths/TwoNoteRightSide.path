@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 2.461681613805452,
-        "y": 4.403274541213847
+        "x": 2.914250573459629,
+        "y": 4.898310911687067
       },
       "prevControl": {
-        "x": 1.4616816138054518,
-        "y": 4.403274541213847
+        "x": 1.9142505734596291,
+        "y": 4.898310911687067
       },
       "nextControl": null,
       "isLocked": false,
@@ -39,13 +39,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 149.03624346792643,
+    "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "TwoNote",
   "previewStartingState": {
-    "rotation": 119.19748604606451,
+    "rotation": 180.0,
     "velocity": 0
   },
   "useDefaultConstraints": true

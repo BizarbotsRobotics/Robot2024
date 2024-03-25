@@ -26,8 +26,8 @@ class SwerveModule:
         self.swerveMotor = MotorController(motorControllerType, MotorType.BRUSHLESS, swerveMotorId)
         self.driveMotor =  MotorController(motorControllerType, MotorType.BRUSHLESS, driveMotorId)
 
-        self.swerveMotor.setCurrentLimit(50)
-        self.driveMotor.setCurrentLimit(45)
+        self.swerveMotor.setCurrentLimit(30)
+        self.driveMotor.setCurrentLimit(60)
 
         #self.swerveMotor.setRampRate(3)
 
@@ -167,8 +167,8 @@ class SwerveModule:
         """
         Sends debug info to condole or smart dashboard
         """
-        # self.sd.putNumber("Encoder "+ str(self.swerveMotorId), self.swerveMotor.getBuiltInEncoderPosition())
-        # self.sd.putNumber("Absolute Encoder "+ str(self.swerveMotorId), self.getSwerveAbsolutePositionReal())
+        #self.sd.putNumber("Encoder "+ str(self.swerveMotorId), self.swerveMotor.getBuiltInEncoderPosition())
+        #self.sd.putNumber("Absolute Encoder "+ str(self.swerveMotorId), self.getSwerveAbsolutePositionReal())
         pass
 
     def getSwerveRelativePosition(self):

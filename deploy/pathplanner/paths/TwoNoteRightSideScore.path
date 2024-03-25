@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "TwoNote",
   "previewStartingState": {
     "rotation": 119.19748604606451,
     "velocity": 0

@@ -3,25 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.41,
-        "y": 5.5
+        "x": 1.3633965729469937,
+        "y": 5.515621031242063
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.6887664017838722,
-        "y": 6.230165042355762
+        "x": 1.642162974730866,
+        "y": 6.245786073597825
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.426549104168107,
-        "y": 7.014791090923124
+        "x": 2.0400914981573175,
+        "y": 6.847658310701237
       },
       "prevControl": {
-        "x": 2.6150567818833568,
-        "y": 7.014791090923124
+        "x": 1.7637849606837794,
+        "y": 6.784760073518556
+      },
+      "nextControl": {
+        "x": 2.316398035630857,
+        "y": 6.910556547883918
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.429026396514333,
+        "y": 6.847658310701237
+      },
+      "prevControl": {
+        "x": 2.6175340742295825,
+        "y": 6.847658310701237
       },
       "nextControl": null,
       "isLocked": false,
@@ -39,13 +55,13 @@
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": 177.87890360333856,
+    "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "ThreeNote",
   "previewStartingState": {
-    "rotation": 177.07138784221436,
+    "rotation": 180.0,
     "velocity": 0
   },
   "useDefaultConstraints": false

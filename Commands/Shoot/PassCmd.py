@@ -13,7 +13,7 @@ from Subsystems.Vision.Vision import Vision
 import constants
 
 
-class ShootCmd(commands2.Command):
+class PassCmd(commands2.Command):
     """A command that will turn the robot to the specified angle."""
 
     def __init__(self, shoober: Shoober, vision: Vision) -> None:
@@ -28,7 +28,7 @@ class ShootCmd(commands2.Command):
         self.counter = 0
         self.timer = 0
         self.shoober.setShooterMotorPower(-1)
-        self.shoober.setPivotPositionLowPower(self.shoober.getDesiredPivot(self.vision.getSpeakerDistance()))
+        self.shoober.setPivotPositionLowPower(30)
         # self.shoober.setPivotPosition(0)
 
     def execute(self):
@@ -38,9 +38,9 @@ class ShootCmd(commands2.Command):
             self.shoober.resetPosition()
             self.shoober.setDualIndexerPosition(1)
             self.counter = 0
-        if self.shoober.getPivotAngle() > self.shoober.getDesiredPivot(self.vision.getSpeakerDistance()) -5:
+        if self.shoober.getPivotAngle() > 25:
             self.timer += 1
-        if  self.shoober.getShooterRPM() < -4000 and self.shoober.getPivotAngle() > self.shoober.getDesiredPivot(self.vision.getSpeakerDistance()) - 5 and self.timer > 2:
+        if  self.shoober.getShooterRPM() < -3000 and self.shoober.getPivotAngle() > 25 and self.timer > 2:
             self.shoober.setDualIndexerPower(-1)
         
     def end(self, interrupted: bool):

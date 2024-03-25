@@ -15,11 +15,11 @@ class IntakeStartPositionCmd(commands2.Command):
         pass
             
     def end(self, interrupted: bool):
-        self.intake.setPivotPower(0)
+        pass
 
     def isFinished(self) -> bool:
-        return self.intake.getIntakePivotAngle() > 38
+        return self.intake.getIntakePivotAngle() < 25
 
     def execute(self):
-        self.intake.setPivotPosition(40.5)
+        self.intake.setPivotPosition(18.6)
         

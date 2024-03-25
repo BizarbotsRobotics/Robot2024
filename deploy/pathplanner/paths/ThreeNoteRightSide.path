@@ -49,7 +49,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "ThreeNote",
   "previewStartingState": {
     "rotation": 119.19748604606451,
     "velocity": 0

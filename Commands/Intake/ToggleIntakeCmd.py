@@ -15,10 +15,10 @@ class ToggleIntakeCmd(commands2.Command):
         print(self.intake.intakeDown)
         if self.intake.intakeDown:
             self.intake.intakeDown = False
-            self.intake.setPivotPosition(32)
+            self.intake.setPivotPosition(29)
         else:
             self.intake.intakeDown = True
-            self.intake.setPivotPosition(40.5)
+            self.intake.setPivotPosition(18.6)
 
     def execute(self):
         pass

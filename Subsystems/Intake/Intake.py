@@ -40,13 +40,14 @@ class Intake(commands2.Subsystem):
         self.pivotMotorTwo.configurator.apply(self.cfg2)
         self.pivotAbsoluteEncoder = wpilib.DutyCycleEncoder(8)
         self.encoderCount = 0
-        self.setPivotEncoderVal(((1- self.pivotAbsoluteEncoder.getAbsolutePosition()) * 60))
+        self.setPivotEncoderVal(((self.pivotAbsoluteEncoder.getAbsolutePosition()) * 60))
         #self.resetPivotEncoder()
 
     def periodic(self):
         if self.encoderCount < 10:
-            self.setPivotEncoderVal(((1- self.pivotAbsoluteEncoder.getAbsolutePosition()) * 60))
+            self.setPivotEncoderVal(((self.pivotAbsoluteEncoder.getAbsolutePosition()) * 60))
             self.encoderCount += 1
+
         self.telemetry()
 
     def telemetry(self):
@@ -54,8 +55,8 @@ class Intake(commands2.Subsystem):
         Sends subsystem info to console or smart dashboard
         """
         pass
-        # self.sd.putNumber("Intake Angle Absolute", self.pivotAbsoluteEncoder.getAbsolutePosition())
-        # self.sd.putNumber("Intake Angle", self.getIntakePivotAngle())
+        self.sd.putNumber("Intake Angle Absolute", self.pivotAbsoluteEncoder.getAbsolutePosition())
+        self.sd.putNumber("Intake Angle", self.getIntakePivotAngle())
 
     def getIntakeRPM(self):
         return self.intakeMotor.getBuiltInEncoderVelocity()
@@ -73,8 +74,8 @@ class Intake(commands2.Subsystem):
         self.pivotMotorOne.set_control(phoenix6.controls.DutyCycleOut(power))
 
     def setPivotEncoderVal(self, value):
-        self.pivotMotorOne.set_position(value)
-        self.pivotMotorTwo.set_position(value)
+        print(self.pivotMotorOne.set_position(value))
+        print(self.pivotMotorTwo.set_position(value))
 
     def resetPivotEncoder(self):
         pass

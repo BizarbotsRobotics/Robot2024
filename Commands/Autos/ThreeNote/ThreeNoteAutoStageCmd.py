@@ -13,16 +13,16 @@ from Subsystems.Drive.SwerveDrive import SwerveDrive
 from Subsystems.Shoober.Shoober import Shoober
 from pathplannerlib import path, auto
 
-class ThreeNoteRightAutoCmd(commands2.SequentialCommandGroup):
+class ThreeNoteAutoStageCmd(commands2.SequentialCommandGroup):
 
     def __init__(self, drive: SwerveDrive, shoober: Shoober, intake: Intake, conveyor: Conveyor):
         super().__init__(
         )
-        self.addCommands(TwoNoteAutoCmd(drive, shoober, intake, conveyor),IntakeToShooterCmd(intake, conveyor, shoober).alongWith(
-                                RunPathCmd(drive, "ThreeNoteRightSide"),
-                                ).withTimeout(3), 
-                                RunPathCmd(drive ,"ThreeNoteRightSideScore"),
-                            ShootCloseCmd(shoober))
+        self.addCommands(TwoNoteAutoCmd(drive, shoober, intake, conveyor),IntakeToShooterCmd(intake, conveyor, shoober).deadlineWith(
+                                RunPathCmd(drive, "ThreeNoteStagePath"),
+                                ), 
+                                RunPathCmd(drive, "ThreeNoteStageScore"),
+                             ShootManualCmd(shoober, 24, -4000))
         
     def field(self):
         return DriverStation.getAlliance() is DriverStation.Alliance.kRed
