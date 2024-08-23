@@ -26,7 +26,7 @@ class SwerveAlignLimelightCmd(commands2.Command):
         forward_limelight = self.swerve.limelight_range_proportional()
         xSpeed = forward_limelight
 
-        self.swerve.driveFR(0, 0, -rot, False, True);
+        self.swerve.driveFR(0, 0, rot, False, True);
 
     def end(self, interrupted: bool):
         self.swerve.driveFR(0,0,0, False, True)

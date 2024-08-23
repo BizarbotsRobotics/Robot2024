@@ -1,6 +1,6 @@
 import math
 import commands2
-from wpilib import DriverStation, geometry
+from wpilib import DriverStation
 from Commands.Intake.IntakeToShooterCmd import IntakeToShooterCmd
 from Commands.PathPlanner.ResetPathCmd import ResetPathCmd
 from Commands.PathPlanner.RunPathCmd import RunPathCmd
@@ -18,10 +18,10 @@ class TwoNoteRightAutoCmd(commands2.SequentialCommandGroup):
     def __init__(self, drive: SwerveDrive, shoober: Shoober, intake: Intake, conveyor: Conveyor):
         super().__init__(
         )
-        self.addCommands(StartConfigCmd(intake, shoober).withTimeout(3), ShootCloseCmd(shoober), commands2.waitcommand.WaitCommand(.5),
+        self.addCommands(StartConfigCmd(intake, shoober).withTimeout(3), ShootCloseCmd(shoober),
                          IntakeToShooterCmd(intake, conveyor, shoober).alongWith(
                                 RunPathCmd(drive, "TwoNoteRightSide"),
-                                ).withTimeout(3), 
+                                ), 
                                 RunPathCmd(drive, "TwoNoteRightSideScore"),
                              ShootCloseCmd(shoober)) 
         

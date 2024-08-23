@@ -40,7 +40,7 @@ class ShootCmd(commands2.Command):
             self.counter = 0
         if self.shoober.getPivotAngle() > self.shoober.getDesiredPivot(self.vision.getSpeakerDistance()) -5:
             self.timer += 1
-        if  self.shoober.getShooterRPM() < -4000 and self.shoober.getPivotAngle() > self.shoober.getDesiredPivot(self.vision.getSpeakerDistance()) - 5 and self.timer > 2:
+        if  self.shoober.getShooterRPM() < -4250 and self.shoober.getPivotAngle() > self.shoober.getDesiredPivot(self.vision.getSpeakerDistance()) - 5 and self.timer > 2:
             self.shoober.setDualIndexerPower(-1)
         
     def end(self, interrupted: bool):

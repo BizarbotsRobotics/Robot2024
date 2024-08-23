@@ -29,7 +29,7 @@ class SwerveModule:
         self.swerveMotor.setCurrentLimit(30)
         self.driveMotor.setCurrentLimit(60)
 
-        #self.swerveMotor.setRampRate(3)
+        self.driveMotor.setRampRate(.2)
 
         # Get Absolute encoder
         self.swerveAbsoluteEncoder = AnalogEncoder(absoluteEncoderPort)
@@ -122,7 +122,7 @@ class SwerveModule:
                                                 geometry.Rotation2d.fromDegrees(self.getSwerveRelativePosition()))
         
         
-        desiredState = self.antiJitter(desiredState, self.lastState, 10)
+        desiredState = self.antiJitter(desiredState, self.lastState, 12)
 
         # Azimuth Motor Set angle
         
@@ -167,8 +167,8 @@ class SwerveModule:
         """
         Sends debug info to condole or smart dashboard
         """
-        #self.sd.putNumber("Encoder "+ str(self.swerveMotorId), self.swerveMotor.getBuiltInEncoderPosition())
-        #self.sd.putNumber("Absolute Encoder "+ str(self.swerveMotorId), self.getSwerveAbsolutePositionReal())
+        self.sd.putNumber("Encoder "+ str(self.swerveMotorId), self.swerveMotor.getBuiltInEncoderPosition())
+        self.sd.putNumber("Absolute Encoder "+ str(self.swerveMotorId), self.getSwerveAbsolutePositionReal())
         pass
 
     def getSwerveRelativePosition(self):

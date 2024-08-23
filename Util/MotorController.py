@@ -10,6 +10,7 @@ class MotorControllerType(Enum):
     FALCON = 2
     VICTOR_SPX = 3
     TALON_SRX = 4
+    KRAKEN = 5
 
 class MotorType(Enum):
     BRUSHED = 1
@@ -47,7 +48,10 @@ class MotorController:
             self.cfg = phoenix6.configs.TalonFXConfiguration()
             self.cfg.motor_output.neutral_mode = phoenix6.signals.NeutralModeValue.COAST
             self.request = phoenix6.controls.PositionDutyCycle(0)
-
+        elif motorControllerType == MotorControllerType.KRAKEN:
+            self.motor = TalonFX(motorID)
+            self.cfg = phoenix6.configs.TalonFXConfiguration()
+            self.cfg.motor_output.neutral_mode = phoenix6.signals.NeutralModeValue.BRAKE
         elif motorControllerType == MotorControllerType.VICTOR_SPX:
             self.motor = ctre.VictorSPX(motorID)
         elif motorControllerType == MotorControllerType.TALON_SRX:
@@ -73,7 +77,8 @@ class MotorController:
             #self.motor.set_control(self.controls.with_o(power))
 
     def setInverted(self, invert):
-        self.motor.setInverted(invert)
+        if self.motorControllerType is MotorControllerType.SPARK_MAX:
+            self.motor.setInverted(invert)
 
     def setPosition(self, position):
         """
@@ -85,7 +90,8 @@ class MotorController:
         if self.motorControllerType is MotorControllerType.SPARK_MAX:
             self.__getPIDController__().setReference(position, rev.CANSparkMax.ControlType.kPosition)
         else:
-            self.motor.set_control(self.request.with_position(20))
+            self.request = phoenix6.controls.PositionVoltage(0)
+            self.motor.set_control(self.request)
     def setVelocity(self, velocity):
         """
         Sets the velocity of the motor using the integrated PID controller.
@@ -152,7 +158,7 @@ class MotorController:
         if self.motorControllerType is MotorControllerType.SPARK_MAX:
             return self.encoder.getVelocity()
         else:
-            return self.motor.getSelectedSensorVelocity(0)
+            return self.motor.get_rotor_velocity().value
         
     def setEncoderPositionConversion(self, conversion):
         """
@@ -309,7 +315,9 @@ class MotorController:
         return self.motor
     
     def setRampRate(self, time):
-        self.motor.setOpenLoopRampRate(time)
+        if self.motorControllerType is MotorControllerType.SPARK_MAX:
+            self.motor.setOpenLoopRampRate(time)
+            self.motor.setClosedLoopRampRate(time)
 
     def initAbsoluteEncoder(self):
         self.absoluteEncoder = self.motor.getAbsoluteEncoder(rev.SparkMaxAbsoluteEncoder.Type.kDutyCycle)
@@ -319,7 +327,7 @@ class MotorController:
 
     def getAbsoluteEncoderPosition(self):
         angle = self.absoluteEncoder.getPosition()
-        angle = math.fmod(+angle, 360)
+        angle = math.fmod(angle, 360)
         if angle < 0:
             return angle if angle >= -180 else angle + 360
         else:

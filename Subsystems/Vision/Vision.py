@@ -76,4 +76,7 @@ class Vision(commands2.Subsystem):
 
     
     def getRobotPose(self):
-        return self.inst.getTable("limelight").getEntry("tx").getDoubleArray([0,0,0,0,0,0])
+        return self.inst.getTable("limelight").getEntry("botpose").getDoubleArray([0,0,0,0,0,0])
+    
+    # def changePipeline(self, number):
+    #     self.inst.getTable("limelight").getEntry("pipeline").setInteger(number)

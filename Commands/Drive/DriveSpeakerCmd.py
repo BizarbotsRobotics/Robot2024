@@ -23,7 +23,7 @@ class DriveSpeakerCmd(commands2.Command):
 
 
     def execute(self):
-        self.steerAdjust = -self.swerve.headingPID.calculate(self.vision.getSpeakerCoords()[0], 0)
+        self.steerAdjust = self.swerve.headingPID.calculate(self.vision.getSpeakerCoords()[0], 0)
        
         self.swerve.driveFR(self.x(),self.y(),self.steerAdjust, False, True)
 

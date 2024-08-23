@@ -13,6 +13,7 @@ class Intake(commands2.Subsystem):
         super().__init__()
         inst = ntcore.NetworkTableInstance.getDefault()
         inst.startServer()
+        self.intakeRunning = False
         self.sd = inst.getTable("SmartDashboard")
 
         self.pivotMotorOne = TalonFX(IntakeConstants.PIVOT_MOTOR_1)
@@ -57,6 +58,7 @@ class Intake(commands2.Subsystem):
         pass
         self.sd.putNumber("Intake Angle Absolute", self.pivotAbsoluteEncoder.getAbsolutePosition())
         self.sd.putNumber("Intake Angle", self.getIntakePivotAngle())
+        self.sd.putBoolean("Intake Running", self.intakeRunning)
 
     def getIntakeRPM(self):
         return self.intakeMotor.getBuiltInEncoderVelocity()
@@ -65,6 +67,10 @@ class Intake(commands2.Subsystem):
         return self.pivotMotorOne.get_rotor_position().value_as_double
     
     def setIntakePower(self, power):
+        if power == 0:
+            self.intakeRunning = False
+        else:
+            self.intakeRunning = True
         self.intakeMotor.setPower(power)
 
     def setPivotPosition(self, degrees):

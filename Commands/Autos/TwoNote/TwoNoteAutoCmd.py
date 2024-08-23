@@ -19,8 +19,8 @@ class TwoNoteAutoCmd(commands2.SequentialCommandGroup):
         )
         self.addCommands(StartConfigCmd(intake, shoober).withTimeout(2), ShootCloseCmd(shoober), commands2.waitcommand.WaitCommand(.5),
                          IntakeToShooterCmd(intake, conveyor, shoober).deadlineWith(
-                                RunPathCmd(drive, "TwoNoteBluePath")),
-                                RunPathCmd(drive, "TwoNoteBluePathScore"),
+                                RunPathCmd(drive, "TwoNoteBluePath")).withTimeout(2.2),
+                                RunPathCmd(drive, "TwoNoteBluePathScore").withTimeout(2.2),
 
                              ShootCloseCmd(shoober))
 

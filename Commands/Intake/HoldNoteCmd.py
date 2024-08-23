@@ -16,17 +16,18 @@ class HoldNoteCmd(commands2.Command):
         self.addRequirements(self.shoober, self.conveyor)
 
     def initialize(self):
-        self.shoober.setPivotPosition(0)
+        self.shoober.setPivotPosition(9)
         self.shoober.setShooterMotorPower(.05)
 
     def execute(self):
-        if self.shoober.getPivotAngle() < 1:
+        if self.shoober.getPivotAngle() < 12:
             self.shoober.setDualIndexerPower(-.7)
             self.conveyor.setConveyorPower(1)
 
     def end(self, interrupted: bool):
         self.shoober.setDualIndexerPower(0)
         self.conveyor.setConveyorPower(0)
+        self.shoober.setPivotPosition(0)
 
     def isFinished(self) -> bool:
         return self.shoober.getNoteStored()

@@ -13,4 +13,4 @@ class IntakeToShooterCmd(commands2.SequentialCommandGroup):
     def __init__(self, intake: Intake, conveyor: Conveyor, shoober: Shoober):
         super().__init__(
         )
-        self.addCommands(IntakeCmd(conveyor, intake), commands2.waitcommand.WaitCommand(.05), HoldNoteCmd(shoober, conveyor), commands2.WaitCommand(.05), AdjustNoteCmd(shoober))
+        self.addCommands(IntakeCmd(conveyor, intake), HoldNoteCmd(shoober, conveyor), AdjustNoteCmd(shoober))

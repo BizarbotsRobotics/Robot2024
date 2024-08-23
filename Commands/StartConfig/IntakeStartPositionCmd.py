@@ -21,5 +21,5 @@ class IntakeStartPositionCmd(commands2.Command):
         return self.intake.getIntakePivotAngle() < 25
 
     def execute(self):
-        self.intake.setPivotPosition(18.6)
+        self.intake.setPivotPosition(20)
         

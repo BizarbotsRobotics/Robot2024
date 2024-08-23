@@ -55,7 +55,7 @@ class SwerveDrive(Subsystem):
             self.getRobotVelocity, # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             self.setChassisSpeeds, # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
             config.HolonomicPathFollowerConfig( # HolonomicPathFollowerConfig, this should likely live in your Constants class
-                controller.PIDConstants(.4, 0.0, 0.0), # Translation PID constants
+                controller.PIDConstants(.1, 0.0, 0.05), # Translation PID constants
                 controller.PIDConstants(.7, 0.0, .1), # Rotation PID constants
                 4.5, # Max module speed, in m/s
                 0.4, # Drive base radius in meters. Distance from robot center to furthest module.
@@ -69,27 +69,27 @@ class SwerveDrive(Subsystem):
     def flipAlliance(self):
         alliance = DriverStation.getAlliance()
         print(alliance)
-        return False
+        return alliance is DriverStation.Alliance.kBlue
     
     def periodic(self):
         self.telemetry()
-        #self.addVisionMeasurement()
+        # self.addVisionMeasurement()
         self.updateOdometry()
 
     def initializeModules(self):
         try:
             self.frontLeft = SwerveModule(SwerveConstants.FRONT_LEFT_DRIVE, SwerveConstants.FRONT_LEFT_SWERVE,
                                         SwerveConstants.FRONT_LEFT_ENCODER_PORT, SwerveConstants.FRONT_LEFT_ENCODER_OFFSET, 
-                                        MotorControllerType.SPARK_MAX, True)
+                                        MotorControllerType.KRAKEN, True)
             self.frontRight = SwerveModule(SwerveConstants.FRONT_RIGHT_DRIVE, SwerveConstants.FRONT_RIGHT_SWERVE,
                                         SwerveConstants.FRONT_RIGHT_ENCODER_PORT, SwerveConstants.FRONT_RIGHT_ENCODER_OFFSET, 
-                                        MotorControllerType.SPARK_MAX, True)
+                                        MotorControllerType.KRAKEN, True)
             self.backLeft = SwerveModule(SwerveConstants.BACK_LEFT_DRIVE, SwerveConstants.BACK_LEFT_SWERVE,
                                         SwerveConstants.BACK_LEFT_ENCODER_PORT, SwerveConstants.BACK_LEFT_ENCODER_OFFSET, 
-                                        MotorControllerType.SPARK_MAX, True)
+                                        MotorControllerType.KRAKEN, True)
             self.backRight = SwerveModule(SwerveConstants.BACK_RIGHT_DRIVE, SwerveConstants.BACK_RIGHT_SWERVE,
                                         SwerveConstants.BACK_RIGHT_ENCODER_PORT, SwerveConstants.BACK_RIGHT_ENCODER_OFFSET, 
-                                        MotorControllerType.SPARK_MAX, True)
+                                        MotorControllerType.KRAKEN, True)
             self.swerveModules = [self.frontLeft, self.frontRight, self.backLeft, self.backRight]
 
         except Exception as e:
@@ -120,7 +120,7 @@ class SwerveDrive(Subsystem):
 
         translationX = translationX * 4.5
         translationY = translationY * 4.5
-        rotation = rotation * 4.5
+        rotation = rotation * 4.5 * 0.8
 
         
         velocity = kinematics.ChassisSpeeds(translationX, translationY, rotation)
@@ -150,15 +150,17 @@ class SwerveDrive(Subsystem):
         if rotation < 0:
             negative = True
         
-        rotation = math.pow(6, math.fabs(rotation) - 1) - .1
+       
         if translationX < .05 and translationX > -.05:
             translationX = 0
 
         if translationY < .05 and translationY > -.05:
             translationY = 0
 
-        if rotation < .25 and rotation > -.25:
+        if rotation < .05 and rotation > -.05:
             rotation = 0
+        else:
+            rotation = math.pow(6, math.fabs(rotation) - 1) - .125
         
 
         translationX = translationX * 4.5
@@ -281,7 +283,7 @@ class SwerveDrive(Subsystem):
 
     def __get_gyro_heading(self, angle) -> float:
         angle = math.degrees(angle)
-        angle = math.fmod(-angle, 360)
+        angle = math.fmod(angle, 360)
 
         if angle < 0:
             return math.radians(angle if angle >= -180 else angle + 360)
@@ -485,8 +487,8 @@ class SwerveDrive(Subsystem):
         for swerve in self.swerveModules:
             swerve.debug()
         
-        # self.sd.putNumber("Pose X", self.getPose().X().real)
-        # self.sd.putNumber("Pose Y", self.getPose().Y().real)
+        self.sd.putNumber("Pose X", self.getPose().X().real)
+        self.sd.putNumber("Pose Y", self.getPose().Y().real)
         self.sd.putNumber("Pose Angle", self.getPose().rotation().degrees().real)
         self.sd.putNumber("Gyro Angle Angle", self.yaw().degrees().real)
         # self.sd.putNumber("Speaker Distance", self.getDistanceFromSpeaker())

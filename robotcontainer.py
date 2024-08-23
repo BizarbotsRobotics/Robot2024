@@ -13,11 +13,18 @@ from Commands.AmpScore.AutoAmpScoreCmd import AutoAmpScoreCmd
 from Commands.AmpScore.PrepareAmp import PrepareAmp
 from Commands.Autos.OneNote.OneNoteDriveCmd import OneNoteDriveCmd
 from Commands.Autos.OneNote.OneNoteGTFOCmd import OneNoteGTFOCmd
+from Commands.Autos.OneNote.OneNoteLeftChaos import OneNoteLeftChaos
 from Commands.Autos.OneNote.OneNoteNoDriveCmd import OneNoteNoDriveCmd
+from Commands.Autos.OneNote.OneNoteRightChaos import OneNoteRightChaos
+from Commands.Autos.ThreeNote.FourNoteAutoCmd import FourNoteAutoCmd
+from Commands.Autos.ThreeNote.ThreeNoteAutoAltCmd import ThreeNoteAutoAltCmd
 from Commands.Autos.ThreeNote.ThreeNoteAutoCmd import ThreeNoteAutoCmd
 from Commands.Autos.ThreeNote.ThreeNoteAutoStageCmd import ThreeNoteAutoStageCmd
+from Commands.Autos.ThreeNote.ThreeNoteLeftAutoCmd import ThreeNoteLeftAutoCmd
 from Commands.Autos.ThreeNote.ThreeNoteRightAutoCmd import ThreeNoteRightAutoCmd
 from Commands.Autos.TwoNote.TwoNoteAutoCmd import TwoNoteAutoCmd
+from Commands.Autos.TwoNote.TwoNoteLeftAutoCmd import TwoNoteLeftAutoCmd
+from Commands.Autos.TwoNote.TwoNoteRightAutoCmd import TwoNoteRightAutoCmd
 from Commands.Drive.DriveAmpCmd import DriveAmpCmd
 from Commands.Drive.DriveSpeakerCmd import DriveSpeakerCmd
 from Commands.Drive.DriveCmd import DriveCmd
@@ -32,6 +39,7 @@ from Commands.Shoot.DistanceShootCmd import DistanceShootCmd
 from Commands.Shoot.PassCmd import PassCmd
 from Commands.Shoot.ShootAmpCmd import ShootAmpCmd
 from Commands.Shoot.ShootCloseCmd import ShootCloseCmd
+from Commands.Shoot.ShootTrapCmd import ShootTrapCmd
 from Commands.StartConfig.StartConfigCmd import StartConfigCmd
 from Commands.Test.shooterTestCmd import ShooterTestCmd
 from Subsystems.Drive.SwerveDrive import SwerveDrive
@@ -131,14 +139,27 @@ class RobotContainer:
         self.chooser.addOption("One Note Drive Straight", OneNoteDriveCmd(self.drive, self.shoober, self.intake, self.conveyor))
         self.chooser.addOption("One Note No Drive", OneNoteNoDriveCmd(self.drive, self.shoober, self.intake, self.conveyor))
 
+        self.chooser.addOption("One Note Chaos (Left)", OneNoteLeftChaos(self.drive, self.shoober, self.intake, self.conveyor))
+        self.chooser.addOption("One Note Chaos (RIght)", OneNoteRightChaos(self.drive, self.shoober, self.intake, self.conveyor))
+
         self.chooser.addOption("Two Note (Front Speaker)", TwoNoteAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
-        self.chooser.addOption("Two Note (Right Speaker)", TwoNoteAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
+        self.chooser.addOption("Two Note (Right Speaker)", TwoNoteRightAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
+
+        self.chooser.addOption("Two Note (Left)", TwoNoteLeftAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
+        self.chooser.addOption("Two Note (Right)", TwoNoteRightAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
         
         self.chooser.addOption("Three Note", ThreeNoteAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
-        self.chooser.addOption("Three Note Right", ThreeNoteRightAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
+
+        #Three Note Starting Center Going Right
+        self.chooser.addOption("ALT Three Note", ThreeNoteAutoAltCmd(self.drive, self.shoober, self.intake, self.conveyor))
+
+        self.chooser.addOption("Three Note (Left)", ThreeNoteLeftAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
+        self.chooser.addOption("Three Note (Right)", ThreeNoteRightAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
+
+        self.chooser.addOption("GREEDY AF", FourNoteAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
+        # self.chooser.addOption("Three Note Right", ThreeNoteRightAutoCmd(self.drive, self.shoober, self.intake, self.conveyor))
 
         self.chooser.addOption("Three Note Stage", ThreeNoteAutoStageCmd(self.drive, self.shoober, self.intake, self.conveyor))
-
         wpilib.SmartDashboard.putData("auto", self.chooser)
         
     def configureButtonBindings(self) -> None:
@@ -163,13 +184,13 @@ class RobotContainer:
         )
 
         # Shoot Speaker Far - Y Button Operator
-        # commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kY).onTrue(
-        #     DistanceShootCmd(self.vision, self.drive, self.shoober)
-        # )
+        commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kY).onTrue(
+            DistanceShootCmd(self.vision, self.drive, self.shoober)
+        )
 
         # Toggle Piston Lock - Back Button Operator
         commands2.button.JoystickButton(self.operatorController, wpilib.XboxController.Button.kBack).onTrue(
-            ToggleLockCmd(self.shoober)
+            ShootTrapCmd(self.shoober)
         ) 
 
         # Toggle Intake Position - Start Button Operator

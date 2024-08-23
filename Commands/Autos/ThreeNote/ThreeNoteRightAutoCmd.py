@@ -19,9 +19,9 @@ class ThreeNoteRightAutoCmd(commands2.SequentialCommandGroup):
         super().__init__(
         )
         self.addCommands(TwoNoteAutoCmd(drive, shoober, intake, conveyor),IntakeToShooterCmd(intake, conveyor, shoober).alongWith(
-                                RunPathCmd(drive, "ThreeNoteRightSide"),
-                                ).withTimeout(3), 
-                                RunPathCmd(drive ,"ThreeNoteRightSideScore"),
+                                RunPathCmd(drive, "ThreeNoteRIghtSide"),
+                                ), 
+                                RunPathCmd(drive ,"ThreeNoteRIghtSideScore"),
                             ShootCloseCmd(shoober))
         
     def field(self):

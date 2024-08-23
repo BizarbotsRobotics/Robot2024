@@ -4,6 +4,7 @@
   "holonomicMode": true,
   "pathFolders": [
     "FourNote",
+    "TenNote",
     "OneNote",
     "ThreeNote",
     "TwoNote"

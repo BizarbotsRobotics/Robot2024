@@ -20,7 +20,7 @@ class AutoHangCmd(commands2.Command):
         
     def end(self, interrupted: bool):
        self.shoober.setPivotPower(0)
-       self.intake.setPivotPosition(33.5)
+       self.intake.setPivotPosition(34)
 
     def isFinished(self) -> bool:
         # End when the controller is at the reference.

@@ -16,28 +16,28 @@
     },
     {
       "anchor": {
-        "x": 2.0400914981573175,
-        "y": 6.847658310701237
+        "x": 2.4148382676223257,
+        "y": 7.026501927468906
       },
       "prevControl": {
-        "x": 1.7637849606837794,
-        "y": 6.784760073518556
+        "x": 2.134840656258676,
+        "y": 6.9828805047278415
       },
       "nextControl": {
-        "x": 2.316398035630857,
-        "y": 6.910556547883918
+        "x": 2.6607658350837378,
+        "y": 7.064815505687196
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.429026396514333,
-        "y": 6.847658310701237
+        "x": 2.625633325446393,
+        "y": 7.026501927468906
       },
       "prevControl": {
-        "x": 2.6175340742295825,
-        "y": 6.847658310701237
+        "x": 2.8141410031616427,
+        "y": 7.026501927468906
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,20 +48,20 @@
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.5,
-    "maxAcceleration": 2.0,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": 180.0,
+    "rotation": 0.0,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "ThreeNote",
   "previewStartingState": {
-    "rotation": 180.0,
+    "rotation": 0.0,
     "velocity": 0
   },
   "useDefaultConstraints": false

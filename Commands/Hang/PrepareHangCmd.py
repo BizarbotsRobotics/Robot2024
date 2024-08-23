@@ -13,12 +13,12 @@ class PrepareHangCmd(commands2.Command):
         self.addRequirements(self.shoober)
 
     def initialize(self):
-        self.intake.setPivotPosition(28)
+        self.intake.setPivotPosition(30)
         self.shoober.disengageLock()
         self.shoober.setPivotPosition(100)
 
     def execute(self):
-        self.intake.setPivotPosition(28)
+        self.intake.setPivotPosition(30)
         self.shoober.setPivotPosition(100)
         pass
         

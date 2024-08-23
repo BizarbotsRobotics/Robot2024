@@ -17,8 +17,8 @@ class OneNoteDriveCmd(commands2.SequentialCommandGroup):
     def __init__(self, drive: SwerveDrive, shoober: Shoober, intake: Intake, conveyor: Conveyor):
         super().__init__(
         )
-        self.addCommands(StartConfigCmd(intake, shoober).withTimeout(2), ShootCloseCmd(shoober), commands2.waitcommand.WaitCommand(.5),
-                                commands2.WaitCommand(4), RunPathCmd(drive, "Drive"))
+        self.addCommands(StartConfigCmd(intake, shoober).withTimeout(2.25), ShootCloseCmd(shoober), commands2.waitcommand.WaitCommand(.5),
+                                commands2.WaitCommand(3), RunPathCmd(drive, "Drive"))
         
     def field(self):
         return DriverStation.getAlliance() is DriverStation.Alliance.kRed

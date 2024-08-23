@@ -113,7 +113,7 @@ class Shoober(Subsystem):
         """
         # self.sd.putNumber("Shoober RPM", self.getShooterRPM())
 
-        #self.sd.putNumber("Shoober Angle", self.getPivotAngle())
+        self.sd.putNumber("Shoober Angle", self.getPivotAngle())
         self.sd.putBoolean("Shooter Note Stored", self.getNoteStored())
 
         # self.sd.putNumber("robot distance", self.distance.get())

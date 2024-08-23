@@ -18,10 +18,10 @@ class ThreeNoteAutoCmd(commands2.SequentialCommandGroup):
     def __init__(self, drive: SwerveDrive, shoober: Shoober, intake: Intake, conveyor: Conveyor):
         super().__init__(
         )
-        self.addCommands(TwoNoteAutoCmd(drive, shoober, intake, conveyor),IntakeToShooterCmd(intake, conveyor, shoober).deadlineWith(
+        self.addCommands(TwoNoteAutoCmd(drive, shoober, intake, conveyor),IntakeToShooterCmd(intake, conveyor, shoober).alongWith(
                                 RunPathCmd(drive, "ThreeNoteBluePath"),
-                                ), 
-                                RunPathCmd(drive, "ThreeNoteBluePathScore"),
+                                ).withTimeout(2.2), 
+                                RunPathCmd(drive, "ThreeNoteBluePathScore").withTimeout(2.2),
                              ShootCloseCmd(shoober))
         
     def field(self):
